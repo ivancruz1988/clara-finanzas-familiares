@@ -1,0 +1,9 @@
+node_modules
+.next
+.env
+.env.local
+*.log
+.vercel
+.artifact_work/
+outputs/
+Presupuesto_Familiar_Cruz_2026_original.xlsx
