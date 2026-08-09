@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, CalendarDays, ChevronDown, CircleDollarSign, LayoutDashboard, Plus, ReceiptText, Search, Settings, Target, WalletCards, X } from "lucide-react";
 import { accounts, budgets, payments as initialPayments, transactions as initialTransactions } from "@/lib/demo-data";
 import type { Payment, Transaction } from "@/lib/types";
+import { AuthGate } from "@/app/auth-gate";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
 const shortDate = (value: string) => new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "short" }).format(new Date(`${value}T12:00:00`));
@@ -26,6 +27,7 @@ export default function Home() {
     : <Payments items={payments} onToggle={(id) => setPayments(items => items.map(item => item.id === id ? {...item, status: item.status === "paid" ? "pending" : "paid"} : item))} />;
 
   return (
+    <AuthGate>
     <div className="shell">
       <Sidebar view={view} setView={setView} />
       <main className="main">
@@ -37,6 +39,7 @@ export default function Home() {
       </main>
       {modal && <EntryModal type={modal} onClose={() => setModal(null)} onTransaction={(item) => setTransactions(x => [item, ...x])} onPayment={(item) => setPayments(x => [item, ...x])}/>} 
     </div>
+    </AuthGate>
   );
 }
 

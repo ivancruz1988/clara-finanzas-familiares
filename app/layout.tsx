@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./theme.css";
+import "./auth.css";
 
 export const metadata: Metadata = {
   title: "Clara — Finanzas familiares",

@@ -6,7 +6,7 @@
 |---|---|---|
 | 1. Base del proyecto | Completada | Repositorio público, documentación y build exitoso |
 | 2. Supabase | Completada | Proyecto remoto `financias_personales`, esquema aplicado, RLS activo y entorno local configurado |
-| 3. Acceso familiar | Pendiente | — |
+| 3. Acceso familiar | Completada | Registro, login, sesión persistente, creación de hogar y cierre de sesión |
 | 4. Cuentas y categorías | Pendiente | — |
 | 5. Movimientos | Pendiente | — |
 | 6. Presupuesto | Pendiente | — |
@@ -17,4 +17,4 @@
 
 ## Próxima etapa
 
-Implementar acceso familiar: pantalla de ingreso, sesión persistente, creación inicial del hogar y cierre de sesión. La clave `service_role` no fue utilizada ni almacenada.
+Implementar cuentas y categorías persistidas en Supabase. La clave `service_role` no fue utilizada ni almacenada.

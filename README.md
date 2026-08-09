@@ -9,6 +9,7 @@ Aplicación web inspirada en la planilla `Presupuesto_Familiar_Cruz_2026`. Reún
 - [Estado actual](docs/STATUS.md)
 - [Estructura y convenciones](docs/PROJECT_STRUCTURE.md)
 - [Sistema visual](docs/VISUAL_SYSTEM.md)
+- [Acceso familiar](docs/AUTHENTICATION.md)
 - [Guía de contribución](CONTRIBUTING.md)
 
 ## Desarrollo local
