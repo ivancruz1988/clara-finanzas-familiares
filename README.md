@@ -11,6 +11,9 @@ Aplicación web inspirada en la planilla `Presupuesto_Familiar_Cruz_2026`. Reún
 - [Sistema visual](docs/VISUAL_SYSTEM.md)
 - [Acceso familiar](docs/AUTHENTICATION.md)
 - [Diagramas del proyecto](docs/DIAGRAMAS.md) ([PDF para imprimir](output/pdf/diagramas-proyecto-clara.pdf))
+- [Arquitectura de IA y RAG](docs/AI_RAG_ARCHITECTURE.md)
+- [Diccionario de datos](docs/DATA_DICTIONARY.md)
+- [Seguridad y privacidad](docs/SECURITY.md)
 - [Guía de contribución](CONTRIBUTING.md)
 
 ## Desarrollo local

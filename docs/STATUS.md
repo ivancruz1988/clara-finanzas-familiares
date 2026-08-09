@@ -4,17 +4,26 @@
 
 | Etapa | Estado | Evidencia |
 |---|---|---|
-| 1. Base del proyecto | Completada | Repositorio público, documentación y build exitoso |
-| 2. Supabase | Completada | Proyecto remoto `financias_personales`, esquema aplicado, RLS activo y entorno local configurado |
-| 3. Acceso familiar | Completada | Registro, login, sesión persistente, creación de hogar y cierre de sesión |
-| 4. Cuentas y categorías | Completada | CRUD de cuentas y categorías conectado a Supabase con RLS por hogar |
-| 5. Movimientos | Pendiente | — |
-| 6. Presupuesto | Pendiente | — |
-| 7. Pagos programados | Pendiente | — |
-| 8. Tablero | Pendiente | — |
-| 9. Calidad | Pendiente | — |
-| 10. Publicación | Pendiente | — |
+| 1. Base del proyecto | Completada | Repositorio público, documentación y build |
+| 2. Supabase | Completada | Esquema, RLS y entorno local |
+| 3. Acceso familiar | Completada | Registro, sesión y creación de hogar |
+| 4. Cuentas y categorías | Completada | CRUD persistente con RLS |
+| 5. Refactorización modular | Próxima | Separación de UI, servicios y reglas |
+| 6. Motor financiero | Pendiente | Cálculos deterministas compartidos |
+| 7-11. Núcleo financiero | Pendiente | Movimientos, transferencias, presupuesto, pagos y tablero |
+| 12. Auditoría y versionado | Pendiente | Auditoría, idempotencia y `data_version` |
+| 13-20. IA y RAG | Diseñada | Arquitectura documentada; implementación pendiente |
+| 21. Evaluaciones de IA | Pendiente | Casos de precisión, seguridad y rendimiento |
+| 22-24. Importación y publicación | Pendiente | Excel, calidad y Vercel |
 
 ## Próxima etapa
 
-Implementar movimientos persistidos en Supabase usando las cuentas y categorías del hogar. La clave `service_role` no fue utilizada ni almacenada.
+Refactorizar la aplicación por módulos antes de implementar movimientos. La lógica financiera saldrá de los componentes y se centralizará para que la interfaz y el futuro asistente utilicen las mismas reglas.
+
+## Decisiones aprobadas
+
+- SQL será la fuente de verdad financiera.
+- Se implementará caché exacta antes de caché semántica.
+- La búsqueda será híbrida: filtros + texto completo + pgvector.
+- Toda salida de IA se validará antes de mostrarse.
+- La seguridad y la caché estarán aisladas por hogar.
