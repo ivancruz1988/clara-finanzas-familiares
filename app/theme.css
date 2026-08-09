@@ -309,3 +309,18 @@ body {
 .account-actions button { width:28px; height:28px; border:1px solid #304a40; border-radius:8px; background:#173329; color:#a9bcb3; display:grid; place-items:center; cursor:pointer; }
 .account-actions svg { width:13px; }
 .account-actions button:hover { color:var(--green); border-color:var(--green); }
+.categories-section { margin-top:38px; padding-top:30px; border-top:1px solid #294239; }
+.category-columns { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.category-column-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.category-column-title h3 { margin:0; font:800 16px Manrope; }
+.category-column-title span { min-width:25px; height:25px; border-radius:20px; display:grid; place-items:center; background:#17392c; color:var(--green); font-size:11px; font-weight:800; }
+.category-items > div { display:grid; grid-template-columns:9px 1fr 28px 28px; align-items:center; gap:8px; padding:11px 0; border-top:1px solid #263b33; }
+.category-items strong { font-size:13px; }
+.category-items p,.category-empty { color:var(--muted); font-size:13px; }
+.category-items button { width:27px; height:27px; display:grid; place-items:center; border:0; border-radius:7px; background:#173329; color:#a9bcb3; cursor:pointer; }
+.category-items button:hover { color:var(--green); }
+.category-items svg { width:13px; }
+.category-kind { width:7px; height:22px; border-radius:8px; background:var(--coral); }
+.category-kind.income { background:var(--green); }
+.category-empty { min-height:90px; display:flex; align-items:center; justify-content:center; gap:8px; }
+@media(max-width:700px){.section-heading{align-items:flex-start;gap:12px}.section-heading .primary{font-size:0;padding:0 12px}.section-heading .primary svg{margin:0}.category-columns{grid-template-columns:1fr}}
