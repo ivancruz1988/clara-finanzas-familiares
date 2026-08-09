@@ -6,6 +6,7 @@ Aplicación web inspirada en la planilla `Presupuesto_Familiar_Cruz_2026`. Reún
 
 - [Arquitectura](docs/ARCHITECTURE.md)
 - [Plan diario](docs/ROADMAP.md)
+- [Estado actual](docs/STATUS.md)
 - [Estructura y convenciones](docs/PROJECT_STRUCTURE.md)
 - [Guía de contribución](CONTRIBUTING.md)
 
