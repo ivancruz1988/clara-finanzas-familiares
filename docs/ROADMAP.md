@@ -15,26 +15,26 @@ Este plan conserva las cuatro etapas ya completadas y agrega la preparación arq
 
 | Día | Fecha | Etapa | Entregable verificable |
 |---|---|---|---|
-| 5 | 10/08 | Refactorización modular | Separar UI, servicios, consultas, tipos y validadores |
-| 6 | 11/08 | Motor financiero | Funciones únicas para saldos, periodos, monedas y proyecciones |
-| 7 | 12/08 | Movimientos | CRUD, filtros, idempotencia y cálculo automático de saldos |
-| 8 | 13/08 | Transferencias y conciliación | Transferencias dobles, estados y trazabilidad |
-| 9 | 14/08 | Presupuesto | Plan mensual, inflación, copia y comparación contra lo real |
-| 10 | 17/08 | Pagos programados | Vencimientos, estados, cuenta de origen y confirmación |
-| 11 | 18/08 | Tablero real | Indicadores obtenidos desde SQL y datos persistidos |
-| 12 | 19/08 | Auditoría y versionado | `audit_events`, `data_version` e invalidación por hogar |
-| 13 | 20/08 | API del asistente | Endpoint servidor, autenticación, rate limit y contratos JSON |
-| 14 | 21/08 | Intenciones y filtros | Clasificador, periodos, cuentas, categorías, moneda y estado |
-| 15 | 24/08 | Caché exacta | Claves normalizadas, TTL, métricas e invalidación |
-| 16 | 25/08 | Base vectorial | `pgvector`, documentos, secciones, embeddings y RLS |
-| 17 | 26/08 | Caché semántica | Similitud, umbrales, aislamiento por hogar y reutilización segura |
-| 18 | 27/08 | Búsqueda híbrida | Full-text + vectores + filtros estructurados + ranking RRF |
-| 19 | 28/08 | RAG financiero | Enrutador SQL/vector/híbrido y construcción de contexto |
-| 20 | 31/08 | Filtros de salida | Validación de fuentes, cifras, vigencia, privacidad y confianza |
-| 21 | 01/09 | Evaluaciones de IA | Casos esperados, seguridad, precisión, latencia y coste |
-| 22 | 02/09 | Importación de Excel | Mapeo, validación, vista previa e importación idempotente |
-| 23 | 03/09 | Calidad integral | Pruebas, responsive, accesibilidad, rendimiento y seguridad |
-| 24 | 04/09 | Publicación | Vercel, variables, migraciones, respaldo y manual de uso |
+| 5 | 21/08 | Refactorización modular | Separar UI, servicios, consultas, tipos y validadores |
+| 6 | 24/08 | Motor financiero | Funciones únicas para saldos, periodos, monedas y proyecciones |
+| 7 | 25/08 | Movimientos | CRUD, filtros, idempotencia y cálculo automático de saldos |
+| 8 | 26/08 | Transferencias y conciliación | Transferencias dobles, estados y trazabilidad |
+| 9 | 27/08 | Presupuesto | Plan mensual, inflación, copia y comparación contra lo real |
+| 10 | 28/08 | Pagos programados | Vencimientos, estados, cuenta de origen y confirmación |
+| 11 | 31/08 | Tablero real | Indicadores obtenidos desde SQL y datos persistidos |
+| 12 | 01/09 | Auditoría y versionado | `audit_events`, `data_version` e invalidación por hogar |
+| 13 | 02/09 | API del asistente | Endpoint servidor, autenticación, rate limit y contratos JSON |
+| 14 | 03/09 | Intenciones y filtros | Clasificador, periodos, cuentas, categorías, moneda y estado |
+| 15 | 04/09 | Caché exacta | Claves normalizadas, TTL, métricas e invalidación |
+| 16 | 07/09 | Base vectorial | `pgvector`, documentos, secciones, embeddings y RLS |
+| 17 | 08/09 | Caché semántica | Similitud, umbrales, aislamiento por hogar y reutilización segura |
+| 18 | 09/09 | Búsqueda híbrida | Full-text + vectores + filtros estructurados + ranking RRF |
+| 19 | 10/09 | RAG financiero | Enrutador SQL/vector/híbrido y construcción de contexto |
+| 20 | 11/09 | Filtros de salida | Validación de fuentes, cifras, vigencia, privacidad y confianza |
+| 21 | 14/09 | Evaluaciones de IA | Casos esperados, seguridad, precisión, latencia y coste |
+| 22 | 15/09 | Importación de Excel | Mapeo, validación, vista previa e importación idempotente |
+| 23 | 16/09 | Calidad integral | Pruebas, responsive, accesibilidad, rendimiento y seguridad |
+| 24 | 17/09 | Publicación | Vercel, variables, migraciones, respaldo y manual de uso |
 
 ## Orden de dependencias
 
