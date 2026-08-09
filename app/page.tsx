@@ -7,6 +7,7 @@ import type { Payment, Transaction } from "@/lib/types";
 import { AuthGate } from "@/app/auth-gate";
 import { AccountsView } from "@/components/accounts/accounts-view";
 import { EntryModal } from "@/components/transactions/entry-modal";
+import { TransactionsView } from "@/components/transactions/transactions-view";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
 const shortDate = (value: string) => new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "short" }).format(new Date(`${value}T12:00:00`));
@@ -15,7 +16,7 @@ type View = "Resumen" | "Movimientos" | "Presupuesto" | "Cuentas" | "Pagos";
 export default function Home() {
   const [view,setView]=useState<View>("Resumen");const [transactions,setTransactions]=useState(initialTransactions);const [payments,setPayments]=useState(initialPayments);const [modal,setModal]=useState<"transaction"|"payment"|null>(null);
   const available=accounts.reduce((sum,a)=>sum+a.balance,0);const pending=payments.filter(p=>p.status==="pending").reduce((sum,p)=>sum+p.amount,0);const projected=available-pending;
-  const page=view==="Resumen"?<Dashboard available={available} pending={pending} projected={projected} transactions={transactions} payments={payments} setView={setView}/>:view==="Movimientos"?<Transactions items={transactions}/>:view==="Presupuesto"?<Budget/>:view==="Cuentas"?<AccountsView pending={payments}/>:<Payments items={payments} onToggle={id=>setPayments(items=>items.map(item=>item.id===id?{...item,status:item.status==="paid"?"pending":"paid"}:item))}/>;
+  const page=view==="Resumen"?<Dashboard available={available} pending={pending} projected={projected} transactions={transactions} payments={payments} setView={setView}/>:view==="Movimientos"?<TransactionsView refreshKey={transactions.length}/>:view==="Presupuesto"?<Budget/>:view==="Cuentas"?<AccountsView pending={payments}/>:<Payments items={payments} onToggle={id=>setPayments(items=>items.map(item=>item.id===id?{...item,status:item.status==="paid"?"pending":"paid"}:item))}/>;
   return <AuthGate><div className="shell"><Sidebar view={view} setView={setView}/><main className="main"><header className="topbar"><div><p className="eyebrow">FINANZAS FAMILIARES</p><h1>{view}</h1></div><div className="top-actions"><button className="period"><CalendarDays size={17}/> Julio 2026 <ChevronDown size={16}/></button><button className="primary" onClick={()=>setModal("transaction")}><Plus size={18}/> Nuevo movimiento</button></div></header>{page}</main>{modal&&<EntryModal type={modal} onClose={()=>setModal(null)} onTransaction={item=>setTransactions(x=>[item,...x])} onPayment={item=>setPayments(x=>[item,...x])}/>}</div></AuthGate>;
 }
 

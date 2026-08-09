@@ -10,7 +10,8 @@
 | 4. Cuentas y categorías | Completada | CRUD persistente con RLS |
 | 5. Refactorización modular | Completada | UI, servicios Supabase y tipos separados por módulo |
 | 6. Motor financiero | Completada | Saldos, disponible, pendientes y proyección con pruebas unitarias |
-| 7-11. Núcleo financiero | Próxima | Movimientos, transferencias, presupuesto, pagos y tablero |
+| 7. Movimientos | Completada | CRUD, búsqueda y filtro por tipo sobre datos reales de Supabase |
+| 8-11. Núcleo financiero | Próxima | Transferencias, presupuesto, pagos y tablero |
 | 12. Auditoría y versionado | Pendiente | Auditoría, idempotencia y `data_version` |
 | 13-20. IA y RAG | Diseñada | Arquitectura documentada; implementación pendiente |
 | 21. Evaluaciones de IA | Pendiente | Casos de precisión, seguridad y rendimiento |
@@ -18,7 +19,7 @@
 
 ## Próxima etapa
 
-Completar el CRUD y los filtros de movimientos usando el motor financiero compartido.
+Implementar transferencias entre cuentas con doble movimiento y trazabilidad.
 
 ## Decisiones aprobadas
 
