@@ -1,0 +1,299 @@
+/*
+ * Clara — Emerald Zenith theme
+ * Visual language adapted from the supplied Google Stitch reference.
+ * This file changes presentation only; layout and information architecture
+ * remain defined by globals.css and the React components.
+ */
+:root {
+  --ink: #f0f7f3;
+  --muted: #8fa69a;
+  --line: #294239;
+  --green: #20e88f;
+  --mint: #17392c;
+  --bg: #07110d;
+  --cream: #0d1d16;
+  --surface: #0d1d16;
+  --surface-raised: #12261d;
+  --surface-soft: #173329;
+  --lime: #dfff00;
+  --amber: #f2ae59;
+  --coral: #ff7269;
+  --shadow: #0000004d;
+}
+
+body {
+  background:
+    radial-gradient(circle at 78% 2%, #0c402b 0, transparent 31rem),
+    linear-gradient(145deg, #07110d 0%, #081611 55%, #06100c 100%);
+  color: var(--ink);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.brand,
+.topbar h1,
+.welcome h2,
+.stat > strong,
+.card-title h3,
+.budget-total strong,
+.account > strong,
+.modal-head h2 {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  letter-spacing: -0.025em;
+}
+
+.sidebar button,
+.period,
+.primary,
+.soft,
+.search input,
+.modal input,
+.modal select {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.sidebar {
+  background: #08150f;
+  border-right: 1px solid #1e382d;
+}
+
+.brand span {
+  background: var(--green);
+  color: #03130c;
+  box-shadow: 0 0 22px #20e88f45;
+}
+
+.sidebar button {
+  color: #8da69a;
+}
+
+.sidebar button.active,
+.sidebar button:hover {
+  background: #143328;
+  color: #f5fff9;
+}
+
+.sidebar button.active {
+  box-shadow: inset 3px 0 0 var(--green);
+}
+
+.demo {
+  background: #10261d;
+  border-color: #28523f;
+}
+
+.demo span {
+  color: var(--green);
+}
+
+.profile {
+  border-color: #1e382d;
+}
+
+.profile > span {
+  background: var(--amber);
+  color: #221407;
+}
+
+.topbar {
+  background: #091610e8;
+  border-color: #223a31;
+  box-shadow: 0 10px 30px #0000001f;
+}
+
+.eyebrow {
+  color: var(--green);
+}
+
+.period {
+  border-color: #304a40;
+  background: #102219;
+  color: #d9e7df;
+}
+
+.primary {
+  border-color: var(--green);
+  background: var(--green);
+  color: #03130c;
+  box-shadow: 0 8px 24px #20e88f29;
+}
+
+.primary:hover {
+  background: #5af0ad;
+}
+
+.health {
+  background: #123528;
+  color: #69efb0;
+  border: 1px solid #245642;
+}
+
+.dot {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+.card,
+.stat,
+.account {
+  background: linear-gradient(145deg, #102219, #0c1b15);
+  border-color: #294239;
+  box-shadow: 0 16px 45px var(--shadow);
+}
+
+.stat.featured {
+  background: linear-gradient(135deg, #126342, #0c4932);
+  border-color: #258960;
+}
+
+.stat-icon {
+  background: #193b2d;
+  color: var(--green);
+}
+
+.stat-icon.warn {
+  background: #42291c;
+  color: var(--amber);
+}
+
+.card-title button,
+.budget-total .right strong {
+  color: var(--green);
+}
+
+.bar {
+  background: #25372f;
+}
+
+.bar i {
+  background: linear-gradient(90deg, #19cf7d, #42efaa);
+  box-shadow: 0 0 12px #20e88f52;
+}
+
+.cat.c1,
+.mini-dot {
+  background: var(--amber);
+}
+
+.cat.c4 {
+  background: var(--coral);
+}
+
+.payment-list > div,
+.tr,
+.category-row,
+.payment-table > div,
+.account > div:not(.account-head) {
+  border-color: #263b33;
+}
+
+.payment-list time {
+  background: #173329;
+  color: #d9eee4;
+}
+
+.soft {
+  background: #17392c;
+  color: var(--green);
+  border: 1px solid #275441;
+}
+
+.tr,
+.category-row > div small,
+.payment-table p small,
+.account > p,
+.account-head small,
+.budget-list small,
+.payment-list small {
+  color: var(--muted);
+}
+
+.tr strong,
+.budget-list p,
+.payment-list p {
+  color: #eff8f3;
+}
+
+.negative {
+  color: var(--coral) !important;
+}
+
+.search {
+  background: #102219;
+  border-color: #304a40;
+  color: #91a79c;
+}
+
+.search input {
+  background: transparent;
+  color: var(--ink);
+}
+
+.search input::placeholder {
+  color: #698076;
+}
+
+.account-head span {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.pill.pending {
+  background: #3d2d16;
+  color: #ffc873;
+}
+
+.pill.paid {
+  background: #143c2c;
+  color: #66efad;
+}
+
+.check {
+  background: #102219;
+  border-color: #466157;
+}
+
+.check.checked {
+  background: var(--green);
+  border-color: var(--green);
+  color: #06140e;
+}
+
+.overlay {
+  background: #020906d9;
+  backdrop-filter: blur(8px);
+}
+
+.modal {
+  background: #102219;
+  border: 1px solid #2e4d40;
+  box-shadow: 0 35px 90px #000000a3;
+}
+
+.modal-head button {
+  background: #1b352a;
+  color: #dcece4;
+}
+
+.modal label {
+  color: #a9bcb3;
+}
+
+.modal input,
+.modal select {
+  background: #0a1812;
+  border-color: #345044;
+  color: var(--ink);
+  color-scheme: dark;
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    background: #08150ff2;
+    border-top: 1px solid #2b463a;
+    border-right: 0;
+    backdrop-filter: blur(12px);
+  }
+
+  .sidebar nav button.active {
+    box-shadow: inset 0 -3px 0 var(--green);
+  }
+}
