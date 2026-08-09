@@ -8,8 +8,8 @@
 | 2. Supabase | Completada | Esquema, RLS y entorno local |
 | 3. Acceso familiar | Completada | Registro, sesión y creación de hogar |
 | 4. Cuentas y categorías | Completada | CRUD persistente con RLS |
-| 5. Refactorización modular | Próxima | Separación de UI, servicios y reglas |
-| 6. Motor financiero | Pendiente | Cálculos deterministas compartidos |
+| 5. Refactorización modular | Completada | UI, servicios Supabase y tipos separados por módulo |
+| 6. Motor financiero | Próxima | Cálculos deterministas compartidos |
 | 7-11. Núcleo financiero | Pendiente | Movimientos, transferencias, presupuesto, pagos y tablero |
 | 12. Auditoría y versionado | Pendiente | Auditoría, idempotencia y `data_version` |
 | 13-20. IA y RAG | Diseñada | Arquitectura documentada; implementación pendiente |
@@ -18,7 +18,7 @@
 
 ## Próxima etapa
 
-Refactorizar la aplicación por módulos antes de implementar movimientos. La lógica financiera saldrá de los componentes y se centralizará para que la interfaz y el futuro asistente utilicen las mismas reglas.
+Implementar el motor financiero compartido para saldos, periodos y proyecciones antes de completar movimientos. La interfaz y el futuro asistente utilizarán las mismas reglas.
 
 ## Decisiones aprobadas
 
