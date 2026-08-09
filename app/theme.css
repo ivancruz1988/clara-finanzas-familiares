@@ -297,3 +297,15 @@ body {
     box-shadow: inset 0 -3px 0 var(--green);
   }
 }
+
+.section-heading { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.section-heading h2 { margin:0 0 4px; font:800 22px Manrope; }
+.section-heading p { margin:0; color:var(--muted); font-size:13px; }
+.empty-state { min-height:260px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:var(--muted); gap:10px; }
+.empty-state h3,.empty-state p { margin:0; }
+.empty-state > svg { width:32px; height:32px; color:var(--green); }
+.account { position:relative; }
+.account-actions { position:absolute; right:15px; top:57px !important; border:0 !important; margin:0 !important; padding:0 !important; display:flex !important; gap:5px; }
+.account-actions button { width:28px; height:28px; border:1px solid #304a40; border-radius:8px; background:#173329; color:#a9bcb3; display:grid; place-items:center; cursor:pointer; }
+.account-actions svg { width:13px; }
+.account-actions button:hover { color:var(--green); border-color:var(--green); }

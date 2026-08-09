@@ -4,8 +4,8 @@ import type { Session, User } from "@supabase/supabase-js";
 import { ArrowRight, Check, Eye, EyeOff, LoaderCircle, LogOut, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { FormEvent, ReactNode, useCallback, useEffect, useState } from "react";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { HouseholdProvider, type Household } from "@/app/family-context";
 
-type Household = { id: string; name: string };
 type Mode = "signin" | "signup";
 
 export function AuthGate({ children }: { children: ReactNode }) {
@@ -55,7 +55,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
         <span className="session-email">{session.user.email}</span>
         <button onClick={() => supabase?.auth.signOut()}><LogOut size={14} /> Salir</button>
       </div>
-      {children}
+      <HouseholdProvider value={household}>{children}</HouseholdProvider>
     </>
   );
 }
