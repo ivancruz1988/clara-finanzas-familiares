@@ -9,8 +9,8 @@
 | 3. Acceso familiar | Completada | Registro, sesión y creación de hogar |
 | 4. Cuentas y categorías | Completada | CRUD persistente con RLS |
 | 5. Refactorización modular | Completada | UI, servicios Supabase y tipos separados por módulo |
-| 6. Motor financiero | Próxima | Cálculos deterministas compartidos |
-| 7-11. Núcleo financiero | Pendiente | Movimientos, transferencias, presupuesto, pagos y tablero |
+| 6. Motor financiero | Completada | Saldos, disponible, pendientes y proyección con pruebas unitarias |
+| 7-11. Núcleo financiero | Próxima | Movimientos, transferencias, presupuesto, pagos y tablero |
 | 12. Auditoría y versionado | Pendiente | Auditoría, idempotencia y `data_version` |
 | 13-20. IA y RAG | Diseñada | Arquitectura documentada; implementación pendiente |
 | 21. Evaluaciones de IA | Pendiente | Casos de precisión, seguridad y rendimiento |
@@ -18,7 +18,7 @@
 
 ## Próxima etapa
 
-Implementar el motor financiero compartido para saldos, periodos y proyecciones antes de completar movimientos. La interfaz y el futuro asistente utilizarán las mismas reglas.
+Completar el CRUD y los filtros de movimientos usando el motor financiero compartido.
 
 ## Decisiones aprobadas
 

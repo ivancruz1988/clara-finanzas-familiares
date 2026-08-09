@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:finance": "node --test tests/unit/finance.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0",

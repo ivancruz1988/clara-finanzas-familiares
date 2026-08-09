@@ -12,6 +12,12 @@ export async function listAccounts(householdId: string) {
   return (data || []) as DbAccount[];
 }
 
+export async function listAccountMovements(householdId: string) {
+  const { data, error } = await client().from("transactions").select("account_id,amount,kind").eq("household_id", householdId);
+  if (error) throw error;
+  return (data || []).map(item=>({accountId:item.account_id as string,amount:Number(item.amount),kind:item.kind as "income"|"expense"}));
+}
+
 export async function saveAccount(values: AccountInput, id?: string) {
   const query = id ? client().from("accounts").update(values).eq("id", id) : client().from("accounts").insert(values);
   const { data, error } = await query.select("id,name,kind,opening_balance,color").single();
