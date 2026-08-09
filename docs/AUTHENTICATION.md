@@ -22,6 +22,8 @@ La interfaz no usa `service_role`. Todas las consultas se realizan con la clave 
 - `lib/supabase.ts`: cliente público de Supabase.
 - `supabase/schema.sql`: membresías, roles y políticas RLS.
 
+El onboarding utiliza los RPC `current_household()` y `create_household()`. La creación del hogar y de la membresía propietaria se resuelve de forma atómica y no depende de un `INSERT ... RETURNING` expuesto a RLS.
+
 ## Pendiente para producción
 
 - Configurar la URL definitiva de Vercel en Authentication → URL Configuration.

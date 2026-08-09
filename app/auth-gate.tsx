@@ -17,10 +17,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     if (!supabase) return;
     setHousehold(undefined);
     const { data, error: queryError } = await supabase
-      .from("households")
-      .select("id, name")
-      .eq("created_by", user.id)
-      .limit(1)
+      .rpc("current_household")
       .maybeSingle();
 
     if (queryError) {
@@ -28,7 +25,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setHousehold(null);
       return;
     }
-    setHousehold(data);
+    setHousehold(data as Household | null);
   }, []);
 
   useEffect(() => {
@@ -49,7 +46,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (session === undefined) return <LoadingScreen />;
   if (!session) return <AuthScreen onSuccess={() => setError("")} />;
   if (household === undefined) return <LoadingScreen label="Preparando tu espacio familiar…" />;
-  if (!household) return <HouseholdSetup user={session.user} error={error} onCreated={setHousehold} />;
+  if (!household) return <HouseholdSetup error={error} onCreated={setHousehold} />;
 
   return (
     <>
@@ -125,7 +122,7 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-function HouseholdSetup({ user, error, onCreated }: { user: User; error: string; onCreated: (household: Household) => void }) {
+function HouseholdSetup({ error, onCreated }: { error: string; onCreated: (household: Household) => void }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(error);
 
@@ -135,13 +132,11 @@ function HouseholdSetup({ user, error, onCreated }: { user: User; error: string;
     const name = String(new FormData(event.currentTarget).get("name")).trim();
     setBusy(true); setMessage("");
     const { data, error: insertError } = await supabase
-      .from("households")
-      .insert({ name, created_by: user.id })
-      .select("id, name")
+      .rpc("create_household", { household_name: name })
       .single();
     setBusy(false);
-    if (insertError) setMessage("No pudimos crear el hogar. Intentá nuevamente.");
-    else onCreated(data);
+    if (insertError) setMessage(`No pudimos crear el hogar: ${insertError.message}`);
+    else onCreated(data as Household);
   }
 
   return <main className="auth-page setup-page"><section className="setup-card"><div className="auth-card-icon"><Users/></div><p className="eyebrow">PRIMER PASO</p><h1>Creá tu espacio familiar</h1><p>Este nombre identifica el presupuesto compartido. Después podrás invitar a otros miembros.</p><form onSubmit={createHousehold}><label>Nombre del hogar<input name="name" required maxLength={60} defaultValue="Familia Cruz" /></label>{message && <p className="form-message error">{message}</p>}<button className="primary auth-submit" disabled={busy}>{busy ? <LoaderCircle className="spin"/> : <>Crear hogar<ArrowRight/></>}</button></form><button className="auth-switch" onClick={() => supabase?.auth.signOut()}>Usar otra cuenta</button></section></main>;
