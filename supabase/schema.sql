@@ -1,7 +1,5 @@
-create extension if not exists "uuid-ossp";
-
 create table public.households (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null default 'Mi familia',
   created_by uuid not null references auth.users(id),
   created_at timestamptz not null default now()
@@ -15,7 +13,7 @@ create table public.household_members (
 );
 
 create table public.accounts (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
   name text not null,
   kind text not null check (kind in ('cash','bank')),
@@ -25,7 +23,7 @@ create table public.accounts (
 );
 
 create table public.categories (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
   name text not null,
   kind text not null default 'expense' check (kind in ('income','expense')),
@@ -33,7 +31,7 @@ create table public.categories (
 );
 
 create table public.transactions (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
   account_id uuid not null references public.accounts(id),
   category_id uuid references public.categories(id),
@@ -46,7 +44,7 @@ create table public.transactions (
 );
 
 create table public.payment_orders (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
   account_id uuid references public.accounts(id),
   category_id uuid references public.categories(id),
@@ -60,7 +58,7 @@ create table public.payment_orders (
 );
 
 create table public.monthly_budgets (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
   category_id uuid not null references public.categories(id),
   month date not null,
@@ -82,10 +80,39 @@ returns boolean language sql security definer set search_path = public stable as
   select exists(select 1 from public.household_members where household_id = target and user_id = auth.uid());
 $$;
 
+create or replace function public.is_household_owner(target uuid)
+returns boolean language sql security definer set search_path = public stable as $$
+  select exists(
+    select 1 from public.household_members
+    where household_id = target and user_id = auth.uid() and role = 'owner'
+  );
+$$;
+
+-- The creator must become an owner automatically. Without this trigger the
+-- first membership insert would be rejected by RLS because no owner exists yet.
+create or replace function public.add_household_creator_as_owner()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.household_members (household_id, user_id, role)
+  values (new.id, new.created_by, 'owner');
+  return new;
+end;
+$$;
+
+create trigger household_creator_membership
+after insert on public.households
+for each row execute function public.add_household_creator_as_owner();
+
 create policy "members read households" on public.households for select using (public.is_household_member(id));
 create policy "users create households" on public.households for insert with check (created_by = auth.uid());
 create policy "members read memberships" on public.household_members for select using (public.is_household_member(household_id));
-create policy "owners manage memberships" on public.household_members for all using (exists(select 1 from public.household_members m where m.household_id=household_id and m.user_id=auth.uid() and m.role='owner'));
+create policy "owners insert memberships" on public.household_members
+  for insert with check (public.is_household_owner(household_id));
+create policy "owners update memberships" on public.household_members
+  for update using (public.is_household_owner(household_id))
+  with check (public.is_household_owner(household_id));
+create policy "owners delete memberships" on public.household_members
+  for delete using (public.is_household_owner(household_id) and user_id <> auth.uid());
 
 do $$ declare t text; begin
   foreach t in array array['accounts','categories','transactions','payment_orders','monthly_budgets'] loop
