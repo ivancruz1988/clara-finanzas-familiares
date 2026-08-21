@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Reemplazar la planilla familiar por una aplicación web compartida, segura y auditable, con cálculos automáticos y un asistente capaz de responder preguntas usando SQL y RAG.
+Ofrecer una aplicación web familiar, segura y auditable, con cálculos automáticos y un asistente capaz de responder preguntas usando SQL y RAG.
 
 ## Componentes
 
@@ -38,8 +38,7 @@ flowchart TB
 4. Presupuesto mensual.
 5. Pagos programados.
 6. Tablero y proyecciones.
-7. Importación de la planilla.
-8. Asistente financiero con fuentes.
+7. Asistente financiero con fuentes.
 
 ## Reglas financieras
 
@@ -83,3 +82,5 @@ Nunca se versionan `.env.local`, claves privadas ni datos financieros reales.
 - [Seguridad](SECURITY.md)
 - [Estructura del repositorio](PROJECT_STRUCTURE.md)
 - [Plan diario](ROADMAP.md)
+
+

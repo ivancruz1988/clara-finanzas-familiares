@@ -7,3 +7,6 @@ node_modules
 .artifact_work/
 outputs/
 Presupuesto_Familiar_Cruz_2026_original.xlsx
+tmp/
+.claude/
+

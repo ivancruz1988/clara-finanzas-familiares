@@ -10,7 +10,12 @@
 | `categories` | Clasificación de ingresos/gastos | hogar, nombre y tipo |
 | `transactions` | Movimientos reales | cuenta, categoría, fecha, importe, tipo y creador |
 | `monthly_budgets` | Plan mensual | categoría, mes, importe e inflación |
-| `payment_orders` | Compromisos futuros | vencimiento, importe, estado y cuenta |
+| `payment_orders` | Compromisos futuros | vencimiento, importe, estado, cuenta y movimiento confirmado |
+| `audit_events` | Auditoria financiera | evento, entidad, usuario, version y metadatos redactados |
+| `ai_documents` | Fuentes para RAG | fuente, titulo, hash, modelo de embedding y metadatos |
+| `ai_document_sections` | Fragmentos vectoriales | contenido, FTS, embedding, token_count y metadata |
+| `ai_query_cache` | Cache exacta/semantica persistente | consulta normalizada, filtros, respuesta validada, embedding y version |
+| `ai_query_runs` | Observabilidad de IA | motor, cache, latencia, fuentes, validacion y coste estimado |
 
 ## Ampliaciones financieras
 
@@ -22,9 +27,17 @@ Contador creciente usado para invalidar caché y respuestas antiguas. Se increme
 
 Clave única por hogar que impide duplicar movimientos durante reintentos.
 
+### `payment_orders.idempotency_key`
+
+Clave unica por hogar que impide duplicar ordenes de pago durante reintentos.
+
 ### `transactions.transfer_group_id`
 
 Vincula la salida y entrada que forman una transferencia entre cuentas.
+
+### `payment_orders.paid_transaction_id`
+
+Vincula una orden de pago confirmada con el movimiento real de gasto creado por `confirm_payment_order`.
 
 ### Estados recomendados
 
@@ -93,6 +106,8 @@ Representa una fuente lógica: documentación, comprobante o conjunto importado.
 | `embedding` | Búsqueda de consultas similares |
 | `data_version` | Versión financiera usada |
 | `expires_at` | Vencimiento |
+| `hit_count` | Reutilizaciones registradas |
+| `created_at`, `updated_at` | Trazabilidad |
 
 ### `ai_query_runs`
 

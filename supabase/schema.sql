@@ -1,7 +1,10 @@
+create extension if not exists vector with schema extensions;
+
 create table public.households (
   id uuid primary key default gen_random_uuid(),
   name text not null default 'Mi familia',
   created_by uuid not null references auth.users(id),
+  data_version bigint not null default 0,
   created_at timestamptz not null default now()
 );
 
@@ -40,6 +43,7 @@ create table public.transactions (
   amount numeric(14,2) not null check (amount > 0),
   kind text not null default 'expense' check (kind in ('income','expense')),
   transfer_group_id uuid,
+  idempotency_key text not null default gen_random_uuid()::text,
   created_by uuid not null default auth.uid() references auth.users(id),
   created_at timestamptz not null default now()
 );
@@ -55,6 +59,8 @@ create table public.payment_orders (
   payment_method text,
   status text not null default 'pending' check (status in ('pending','paid')),
   paid_at timestamptz,
+  paid_transaction_id uuid references public.transactions(id) on delete set null,
+  idempotency_key text not null default gen_random_uuid()::text,
   created_at timestamptz not null default now()
 );
 
@@ -68,6 +74,88 @@ create table public.monthly_budgets (
   unique(household_id, category_id, month)
 );
 
+create table public.audit_events (
+  id uuid primary key default gen_random_uuid(),
+  household_id uuid not null references public.households(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
+  event_type text not null,
+  entity_type text not null,
+  entity_id uuid not null,
+  metadata jsonb not null default '{}'::jsonb,
+  data_version bigint not null,
+  created_at timestamptz not null default now()
+);
+
+create table public.ai_documents (
+  id uuid primary key default gen_random_uuid(),
+  household_id uuid references public.households(id) on delete cascade,
+  source_type text not null check (source_type in ('help','receipt','transaction','payment','budget','note')),
+  source_id uuid,
+  title text not null,
+  content_hash text not null,
+  embedding_model text,
+  embedding_version text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique(household_id,source_type,source_id,content_hash)
+);
+
+create table public.ai_document_sections (
+  id uuid primary key default gen_random_uuid(),
+  document_id uuid not null references public.ai_documents(id) on delete cascade,
+  household_id uuid references public.households(id) on delete cascade,
+  section_index integer not null,
+  content text not null,
+  content_hash text not null,
+  token_count integer not null default 0,
+  metadata jsonb not null default '{}'::jsonb,
+  embedding extensions.vector(1536),
+  embedding_model text,
+  embedding_version text,
+  fts tsvector generated always as (to_tsvector('spanish', content)) stored,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique(document_id,section_index)
+);
+
+create table public.ai_query_cache (
+  id uuid primary key default gen_random_uuid(),
+  household_id uuid not null references public.households(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  normalized_query text not null,
+  query_hash text not null,
+  intent text not null,
+  filters jsonb not null default '{}'::jsonb,
+  answer_payload jsonb not null,
+  source_ids uuid[] not null default '{}',
+  embedding extensions.vector(1536),
+  embedding_model text,
+  embedding_version text,
+  data_version bigint not null,
+  expires_at timestamptz not null,
+  hit_count integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table public.ai_query_runs (
+  id uuid primary key default gen_random_uuid(),
+  household_id uuid not null references public.households(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
+  intent text not null,
+  filters jsonb not null default '{}'::jsonb,
+  engine text not null,
+  cache_kind text not null default 'miss' check (cache_kind in ('miss','exact','semantic','assist')),
+  cache_similarity double precision,
+  data_version bigint not null,
+  latency_ms integer,
+  source_count integer not null default 0,
+  validation_status text not null default 'pending',
+  estimated_cost numeric(12,6),
+  created_at timestamptz not null default now()
+);
+
 alter table public.households enable row level security;
 alter table public.household_members enable row level security;
 alter table public.accounts enable row level security;
@@ -75,6 +163,11 @@ alter table public.categories enable row level security;
 alter table public.transactions enable row level security;
 alter table public.payment_orders enable row level security;
 alter table public.monthly_budgets enable row level security;
+alter table public.audit_events enable row level security;
+alter table public.ai_documents enable row level security;
+alter table public.ai_document_sections enable row level security;
+alter table public.ai_query_cache enable row level security;
+alter table public.ai_query_runs enable row level security;
 
 create or replace function public.is_household_member(target uuid)
 returns boolean language sql security definer set search_path = public stable as $$
@@ -168,6 +261,25 @@ create policy "owners update memberships" on public.household_members
   with check (public.is_household_owner(household_id));
 create policy "owners delete memberships" on public.household_members
   for delete using (public.is_household_owner(household_id) and user_id <> auth.uid());
+create policy "members read audit events" on public.audit_events
+  for select using (public.is_household_member(household_id));
+create policy "members read ai documents" on public.ai_documents
+  for select using (household_id is null or public.is_household_member(household_id));
+create policy "members manage ai documents" on public.ai_documents
+  for all using (household_id is not null and public.is_household_member(household_id))
+  with check (household_id is not null and public.is_household_member(household_id));
+create policy "members read ai sections" on public.ai_document_sections
+  for select using (household_id is null or public.is_household_member(household_id));
+create policy "members manage ai sections" on public.ai_document_sections
+  for all using (household_id is not null and public.is_household_member(household_id))
+  with check (household_id is not null and public.is_household_member(household_id));
+create policy "members manage own ai query cache" on public.ai_query_cache
+  for all using (public.is_household_member(household_id) and user_id = auth.uid())
+  with check (public.is_household_member(household_id) and user_id = auth.uid());
+create policy "members read own ai query runs" on public.ai_query_runs
+  for select using (public.is_household_member(household_id) and user_id = auth.uid());
+create policy "members insert own ai query runs" on public.ai_query_runs
+  for insert with check (public.is_household_member(household_id) and user_id = auth.uid());
 
 do $$ declare t text; begin
   foreach t in array array['accounts','categories','transactions','payment_orders','monthly_budgets'] loop
@@ -177,7 +289,241 @@ end $$;
 
 create index transactions_household_date_idx on public.transactions(household_id, transaction_date desc);
 create index transactions_transfer_group_idx on public.transactions(transfer_group_id) where transfer_group_id is not null;
+create unique index transactions_household_idempotency_idx on public.transactions(household_id,idempotency_key);
 create index payments_household_due_idx on public.payment_orders(household_id, due_date, status);
+create unique index payment_orders_household_idempotency_idx on public.payment_orders(household_id,idempotency_key);
+create index audit_events_household_version_idx on public.audit_events(household_id,data_version desc);
+create index ai_documents_household_source_idx on public.ai_documents(household_id,source_type,source_id);
+create index ai_document_sections_household_idx on public.ai_document_sections(household_id,document_id,section_index);
+create index ai_document_sections_fts_idx on public.ai_document_sections using gin(fts);
+create index ai_document_sections_embedding_idx on public.ai_document_sections using ivfflat (embedding extensions.vector_cosine_ops) with (lists = 100) where embedding is not null;
+create unique index ai_query_cache_exact_idx on public.ai_query_cache(household_id,user_id,query_hash,data_version);
+create index ai_query_cache_scope_idx on public.ai_query_cache(household_id,user_id,intent,data_version,expires_at);
+create index ai_query_cache_embedding_idx on public.ai_query_cache using ivfflat (embedding extensions.vector_cosine_ops) with (lists = 100) where embedding is not null;
+create index ai_query_runs_scope_idx on public.ai_query_runs(household_id,user_id,created_at desc);
+
+create or replace function public.touch_ai_document_updated_at()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+create trigger touch_ai_documents_updated_at
+before update on public.ai_documents
+for each row execute function public.touch_ai_document_updated_at();
+
+create trigger touch_ai_document_sections_updated_at
+before update on public.ai_document_sections
+for each row execute function public.touch_ai_document_updated_at();
+
+create trigger touch_ai_query_cache_updated_at
+before update on public.ai_query_cache
+for each row execute function public.touch_ai_document_updated_at();
+
+create or replace function public.match_ai_document_sections(
+  target_household uuid,
+  query_embedding extensions.vector(1536),
+  match_count integer default 8,
+  source_filter text default null
+)
+returns table (
+  id uuid,
+  document_id uuid,
+  content text,
+  metadata jsonb,
+  similarity double precision
+)
+language sql stable security definer set search_path = public as $$
+  select
+    s.id,
+    s.document_id,
+    s.content,
+    s.metadata,
+    1 - (s.embedding <=> query_embedding) as similarity
+  from public.ai_document_sections s
+  join public.ai_documents d on d.id = s.document_id
+  where s.embedding is not null
+    and (s.household_id = target_household or s.household_id is null)
+    and (s.household_id is null or public.is_household_member(s.household_id))
+    and (source_filter is null or d.source_type = source_filter)
+  order by s.embedding <=> query_embedding
+  limit least(match_count, 20);
+$$;
+
+revoke all on function public.match_ai_document_sections(uuid,extensions.vector(1536),integer,text) from public;
+grant execute on function public.match_ai_document_sections(uuid,extensions.vector(1536),integer,text) to authenticated;
+
+create or replace function public.hybrid_search_ai_document_sections(
+  target_household uuid,
+  query_text text,
+  query_embedding extensions.vector(1536),
+  match_count integer default 8,
+  source_filter text default null,
+  text_weight double precision default 0.5,
+  vector_weight double precision default 0.5,
+  rrf_k integer default 60
+)
+returns table (
+  id uuid,
+  document_id uuid,
+  content text,
+  metadata jsonb,
+  text_rank integer,
+  vector_rank integer,
+  text_score double precision,
+  vector_score double precision,
+  hybrid_score double precision
+)
+language sql stable security definer set search_path = public as $$
+  with params as (
+    select websearch_to_tsquery('spanish', coalesce(nullif(trim(query_text), ''), '')) as tsq
+  ),
+  candidates as (
+    select
+      s.id,
+      s.document_id,
+      s.content,
+      s.metadata,
+      ts_rank_cd(s.fts, params.tsq) as text_score_raw,
+      case when s.embedding is null or query_embedding is null then null else 1 - (s.embedding <=> query_embedding) end as vector_score_raw,
+      case when params.tsq = ''::tsquery then null else row_number() over (order by ts_rank_cd(s.fts, params.tsq) desc, s.id) end as text_rank,
+      case when s.embedding is null or query_embedding is null then null else row_number() over (order by s.embedding <=> query_embedding, s.id) end as vector_rank
+    from public.ai_document_sections s
+    join public.ai_documents d on d.id = s.document_id
+    cross join params
+    where (s.household_id = target_household or s.household_id is null)
+      and (s.household_id is null or public.is_household_member(s.household_id))
+      and (source_filter is null or d.source_type = source_filter)
+      and (
+        (params.tsq <> ''::tsquery and s.fts @@ params.tsq)
+        or (s.embedding is not null and query_embedding is not null)
+      )
+  )
+  select
+    c.id,
+    c.document_id,
+    c.content,
+    c.metadata,
+    c.text_rank::integer,
+    c.vector_rank::integer,
+    coalesce(text_weight/(rrf_k+c.text_rank),0)::double precision as text_score,
+    coalesce(vector_weight/(rrf_k+c.vector_rank),0)::double precision as vector_score,
+    (
+      coalesce(text_weight/(rrf_k+c.text_rank),0) +
+      coalesce(vector_weight/(rrf_k+c.vector_rank),0)
+    )::double precision as hybrid_score
+  from candidates c
+  order by hybrid_score desc, c.id
+  limit least(match_count, 20);
+$$;
+
+revoke all on function public.hybrid_search_ai_document_sections(uuid,text,extensions.vector(1536),integer,text,double precision,double precision,integer) from public;
+grant execute on function public.hybrid_search_ai_document_sections(uuid,text,extensions.vector(1536),integer,text,double precision,double precision,integer) to authenticated;
+
+create or replace function public.match_ai_query_cache(
+  target_household uuid,
+  target_user uuid,
+  query_embedding extensions.vector(1536),
+  target_intent text,
+  target_filters jsonb,
+  target_data_version bigint,
+  min_similarity double precision default 0.94,
+  match_count integer default 5
+)
+returns table (
+  id uuid,
+  answer_payload jsonb,
+  source_ids uuid[],
+  filters jsonb,
+  data_version bigint,
+  expires_at timestamptz,
+  similarity double precision
+)
+language sql security definer set search_path = public stable as $$
+  select
+    c.id,
+    c.answer_payload,
+    c.source_ids,
+    c.filters,
+    c.data_version,
+    c.expires_at,
+    1 - (c.embedding <=> query_embedding) as similarity
+  from public.ai_query_cache c
+  where auth.uid() = target_user
+    and c.household_id = target_household
+    and c.user_id = target_user
+    and public.is_household_member(c.household_id)
+    and c.embedding is not null
+    and c.intent = target_intent
+    and c.filters = target_filters
+    and c.data_version = target_data_version
+    and c.expires_at > now()
+    and 1 - (c.embedding <=> query_embedding) >= min_similarity
+  order by c.embedding <=> query_embedding
+  limit least(match_count, 10);
+$$;
+
+revoke all on function public.match_ai_query_cache(uuid,uuid,extensions.vector(1536),text,jsonb,bigint,double precision,integer) from public;
+grant execute on function public.match_ai_query_cache(uuid,uuid,extensions.vector(1536),text,jsonb,bigint,double precision,integer) to authenticated;
+
+create or replace function public.bump_household_version(target_household uuid)
+returns bigint language plpgsql security definer set search_path = public as $$
+declare
+  next_version bigint;
+begin
+  update public.households
+  set data_version = data_version + 1
+  where id = target_household
+  returning data_version into next_version;
+  return coalesce(next_version,0);
+end;
+$$;
+
+create or replace function public.audit_financial_change()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  target_household uuid;
+  target_id uuid;
+  next_version bigint;
+begin
+  if tg_op = 'DELETE' then
+    target_household := old.household_id;
+    target_id := old.id;
+  else
+    target_household := new.household_id;
+    target_id := new.id;
+  end if;
+
+  if target_household is null then
+    if tg_op = 'DELETE' then return old; end if;
+    return new;
+  end if;
+
+  next_version := public.bump_household_version(target_household);
+
+  insert into public.audit_events(household_id,user_id,event_type,entity_type,entity_id,metadata,data_version)
+  values (
+    target_household,
+    auth.uid(),
+    lower(tg_op),
+    tg_table_name,
+    target_id,
+    jsonb_build_object('table',tg_table_name,'operation',tg_op,'at',now()),
+    next_version
+  );
+
+  if tg_op = 'DELETE' then return old; end if;
+  return new;
+end;
+$$;
+
+do $$ declare t text; begin
+  foreach t in array array['accounts','categories','transactions','payment_orders','monthly_budgets'] loop
+    execute format('create trigger audit_%1$s_changes after insert or update or delete on public.%1$I for each row execute function public.audit_financial_change()', t);
+  end loop;
+end $$;
 
 create or replace function public.create_transfer(source_account uuid, destination_account uuid, transfer_date date, transfer_description text, transfer_amount numeric)
 returns uuid language plpgsql security definer set search_path = public as $$
@@ -209,3 +555,49 @@ $$;
 
 revoke all on function public.create_transfer(uuid,uuid,date,text,numeric) from public;
 grant execute on function public.create_transfer(uuid,uuid,date,text,numeric) to authenticated;
+
+create or replace function public.confirm_payment_order(target_payment uuid, payment_date date default current_date)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare
+  payment_record public.payment_orders%rowtype;
+  transaction_id uuid;
+begin
+  if auth.uid() is null then raise exception 'Authentication required'; end if;
+
+  select * into payment_record
+  from public.payment_orders
+  where id = target_payment
+  for update;
+
+  if payment_record.id is null then raise exception 'Payment order not found'; end if;
+  if not public.is_household_member(payment_record.household_id) then raise exception 'Payment order not found'; end if;
+  if payment_record.account_id is null then raise exception 'Payment order needs an origin account'; end if;
+
+  if payment_record.status = 'paid' and payment_record.paid_transaction_id is not null then
+    return payment_record.paid_transaction_id;
+  end if;
+
+  insert into public.transactions(household_id,account_id,category_id,transaction_date,description,amount,kind)
+  values (
+    payment_record.household_id,
+    payment_record.account_id,
+    payment_record.category_id,
+    coalesce(payment_date,current_date),
+    'Pago: ' || payment_record.description,
+    payment_record.amount,
+    'expense'
+  )
+  returning id into transaction_id;
+
+  update public.payment_orders
+  set status = 'paid',
+      paid_at = now(),
+      paid_transaction_id = transaction_id
+  where id = payment_record.id;
+
+  return transaction_id;
+end;
+$$;
+
+revoke all on function public.confirm_payment_order(uuid,date) from public;
+grant execute on function public.confirm_payment_order(uuid,date) to authenticated;

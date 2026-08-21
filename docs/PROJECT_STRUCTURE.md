@@ -13,7 +13,7 @@ finanzas-personales/
 │   ├── transactions/                # Componentes de movimientos
 │   ├── budget/                      # Componentes de presupuesto
 │   ├── payments/                    # Componentes de pagos
-│   ├── assistant/                   # Chat, fuentes y estados
+│   ├── assistant/                   # Contratos, RAG, cache, busqueda, rate limit y estados
 │   └── ui/                          # Componentes visuales reutilizables
 ├── features/
 │   ├── accounts/                    # Servicio, consultas y validación
@@ -41,7 +41,7 @@ finanzas-personales/
 │   ├── DATA_DICTIONARY.md
 │   ├── SECURITY.md
 │   └── adr/                         # Decisiones arquitectónicas
-└── scripts/                         # Importación, seed y evaluaciones
+└── scripts/                         # Seed, diagramas y evaluaciones
 ```
 
 ## Responsabilidades
@@ -70,3 +70,4 @@ Chat -> API servidor -> filtros -> caché/RAG/SQL -> guarda de salida -> respues
 - Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:` o `chore:`.
 - Los contratos externos se validan mediante esquemas tipados.
 - Los prompts se versionan y no contienen secretos.
+

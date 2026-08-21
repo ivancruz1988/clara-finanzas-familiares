@@ -1,75 +1,76 @@
-# Plan diario de implementación
+# Plan diario de implementacion
 
-Este plan conserva las cuatro etapas ya completadas y agrega la preparación arquitectónica necesaria para incorporar IA, RAG, caché semántica y búsqueda híbrida sin comprometer la exactitud financiera.
+Este plan refleja el avance real al 10 de agosto de 2026. Las etapas 1 a 10 ya quedaron abordadas antes de las fechas originales, por lo que el resto del calendario se reagenda desde el 11 de agosto.
 
 ## Etapas completadas
 
-| Día | Fecha | Etapa | Resultado |
+| Dia | Fecha | Etapa | Resultado |
 |---|---|---|---|
-| 1 | 03/08/2026 | Base del proyecto | Repositorio, documentación y aplicación Next.js |
+| 1 | 03/08/2026 | Base del proyecto | Repositorio, documentacion y aplicacion Next.js |
 | 2 | 04/08/2026 | Supabase | Esquema PostgreSQL, RLS y entorno local |
-| 3 | 05/08/2026 | Acceso familiar | Registro, login, sesión y creación de hogar |
-| 4 | 09/08/2026 | Cuentas y categorías | CRUD persistente por hogar |
+| 3 | 05/08/2026 | Acceso familiar | Registro, login, sesion y creacion de hogar |
+| 4 | 09/08/2026 | Cuentas y categorias | CRUD persistente por hogar |
+| 5 | 09/08/2026 | Refactorizacion modular | UI, servicios, tipos y modulos financieros separados |
+| 6 | 09/08/2026 | Motor financiero | Saldos, pendientes y proyeccion con pruebas unitarias |
+| 7 | 09/08/2026 | Movimientos | CRUD, busqueda y filtro por tipo con datos reales |
+| 8 | 09/08/2026 | Transferencias | Operacion atomica entre cuentas con doble movimiento |
+| 9 | 10/08/2026 | Presupuesto | Plan mensual persistido y comparacion contra gastos reales |
+| 10 | 10/08/2026 | Pagos programados | Vencimientos persistidos, confirmacion y movimiento real asociado |
+| 11 | 11/08/2026 | Tablero real | Indicadores obtenidos desde SQL y datos persistidos |
+| 12 | 11/08/2026 | Auditoria y versionado | `audit_events`, `data_version` e idempotencia |
+| 13 | 11/08/2026 | API del asistente | Endpoint servidor, autenticacion, rate limit y contratos JSON |
+| 14 | 11/08/2026 | Intenciones y filtros | Clasificador, periodos, cuentas, categorias, moneda, estado y montos |
+| 15 | 11/08/2026 | Cache exacta | Clave normalizada, TTL, metricas e invalidacion por `data_version` |
+| 16 | 11/08/2026 | Base vectorial | `pgvector`, documentos, secciones, embeddings, FTS y RLS |
+| 17 | 11/08/2026 | Cache semantica | Similitud, umbrales, aislamiento por hogar y reutilizacion segura |
+| 18 | 12/08/2026 | Busqueda hibrida | Full-text + vectores + filtros estructurados + ranking RRF |
+| 19 | 12/08/2026 | RAG financiero | Enrutador SQL/vector/hibrido y construccion de contexto |
+| 20 | 12/08/2026 | Filtros de salida | Validacion de fuentes, cifras, vigencia, privacidad y confianza |
+| 21 | 12/08/2026 | Evaluaciones de IA | Casos esperados, seguridad, precision, latencia y coste |
 
-## Nuevo plan de implementación
+## Agenda de publicación
 
-| Día | Fecha | Etapa | Entregable verificable |
+| Dia | Fecha | Etapa | Entregable verificable |
 |---|---|---|---|
-| 5 | 21/08 | Refactorización modular | Separar UI, servicios, consultas, tipos y validadores |
-| 6 | 24/08 | Motor financiero | Funciones únicas para saldos, periodos, monedas y proyecciones |
-| 7 | 25/08 | Movimientos | CRUD, filtros, idempotencia y cálculo automático de saldos |
-| 8 | 26/08 | Transferencias y conciliación | Transferencias dobles, estados y trazabilidad |
-| 9 | 27/08 | Presupuesto | Plan mensual, inflación, copia y comparación contra lo real |
-| 10 | 28/08 | Pagos programados | Vencimientos, estados, cuenta de origen y confirmación |
-| 11 | 31/08 | Tablero real | Indicadores obtenidos desde SQL y datos persistidos |
-| 12 | 01/09 | Auditoría y versionado | `audit_events`, `data_version` e invalidación por hogar |
-| 13 | 02/09 | API del asistente | Endpoint servidor, autenticación, rate limit y contratos JSON |
-| 14 | 03/09 | Intenciones y filtros | Clasificador, periodos, cuentas, categorías, moneda y estado |
-| 15 | 04/09 | Caché exacta | Claves normalizadas, TTL, métricas e invalidación |
-| 16 | 07/09 | Base vectorial | `pgvector`, documentos, secciones, embeddings y RLS |
-| 17 | 08/09 | Caché semántica | Similitud, umbrales, aislamiento por hogar y reutilización segura |
-| 18 | 09/09 | Búsqueda híbrida | Full-text + vectores + filtros estructurados + ranking RRF |
-| 19 | 10/09 | RAG financiero | Enrutador SQL/vector/híbrido y construcción de contexto |
-| 20 | 11/09 | Filtros de salida | Validación de fuentes, cifras, vigencia, privacidad y confianza |
-| 21 | 14/09 | Evaluaciones de IA | Casos esperados, seguridad, precisión, latencia y coste |
-| 22 | 15/09 | Importación de Excel | Mapeo, validación, vista previa e importación idempotente |
-| 23 | 16/09 | Calidad integral | Pruebas, responsive, accesibilidad, rendimiento y seguridad |
-| 24 | 17/09 | Publicación | Vercel, variables, migraciones, respaldo y manual de uso |
+| 22 | 20/08/2026 | Calidad integral | Pruebas, responsive, accesibilidad, rendimiento y seguridad |
+| 23 | 20/08/2026 | Publicacion | Vercel, variables, migraciones, respaldo y manual de uso |
 
 ## Orden de dependencias
 
 ```mermaid
 flowchart LR
-    A["Módulos financieros"] --> B["Motor financiero"]
-    B --> C["Auditoría y data_version"]
+    A["Modulos financieros"] --> B["Motor financiero"]
+    B --> C["Auditoria y data_version"]
     C --> D["API del asistente"]
-    D --> E["Caché exacta"]
+    D --> E["Cache exacta"]
     E --> F["pgvector"]
-    F --> G["Caché semántica"]
-    G --> H["Búsqueda híbrida"]
+    F --> G["Cache semantica"]
+    G --> H["Busqueda hibrida"]
     H --> I["RAG"]
     I --> J["Filtros de salida"]
     J --> K["Evaluaciones"]
 ```
 
-## Definición de terminado
+## Definicion de terminado
 
 Una etapa queda terminada cuando:
 
-- el código compila y las migraciones son reproducibles;
+- el codigo compila y las migraciones son reproducibles;
 - existen pruebas proporcionales al riesgo;
 - RLS impide acceso entre hogares;
-- los cálculos financieros se validan contra SQL;
+- los calculos financieros se validan contra SQL;
 - no se guardan secretos ni datos financieros reales en Git;
-- se actualiza la documentación relacionada;
+- se actualiza la documentacion relacionada;
 - existe un commit descriptivo;
 - el resultado puede demostrarse.
 
 ## Criterios especiales para IA
 
 - ninguna cifra se acepta sin recalcularla en PostgreSQL;
-- ninguna respuesta cruza límites de hogar;
+- ninguna respuesta cruza limites de hogar;
 - toda respuesta indica periodo, moneda y fuentes;
-- las acciones de escritura requieren confirmación;
-- un cambio financiero invalida la caché anterior;
+- las acciones de escritura requieren confirmacion;
+- un cambio financiero invalida la cache anterior;
 - los cambios de modelo o prompt deben superar las evaluaciones.
+
+

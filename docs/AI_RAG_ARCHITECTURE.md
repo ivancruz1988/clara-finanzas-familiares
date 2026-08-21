@@ -37,6 +37,13 @@ flowchart TD
     SAVE --> RES["Respuesta con fuentes"]
 ```
 
+Implementacion inicial del RAG:
+
+- `routeRagQuery` decide entre `sql`, `hybrid`, `vector` o `clarify`;
+- `buildRagContext` agrega guardrails de hogar, periodo y `data_version`;
+- las rutas con vectores o busqueda hibrida siempre exigen verificacion SQL antes de mostrar importes;
+- el endpoint expone `rag.engine`, `needsEmbedding`, `needsSqlVerification` y cantidad de contexto.
+
 ## Clasificación de intención
 
 Intenciones iniciales:
@@ -86,7 +93,7 @@ Reglas:
 La clave se construye con consulta normalizada, intención, filtros, hogar y versión:
 
 ```text
-household:intent:period:accounts:categories:currency:status:data_version
+household:user:intent:period:accounts:categories:currency:status:amounts:normalized_query:data_version
 ```
 
 TTL inicial:
@@ -111,6 +118,12 @@ Umbrales iniciales, sujetos a evaluación:
 - nunca reutilizar si difieren periodo, moneda, permisos o fuentes vigentes.
 
 La similitud no basta: el sistema exige igualdad estructural de filtros críticos.
+
+Implementacion inicial:
+
+- `ai_query_cache` guarda respuestas validadas con embedding, `query_hash`, filtros y vencimiento;
+- `match_ai_query_cache` busca vecinos vectoriales solo para el mismo hogar, usuario, intencion, filtros y version;
+- `semanticCacheDecision` permite tres resultados: reutilizar, asistir el enrutamiento o tratar como consulta nueva.
 
 ## Búsqueda semántica
 
@@ -139,6 +152,12 @@ Pesos iniciales:
 - consultas con nombres propios, facturas o comercios: texto `0.65`, semántica `0.35`;
 - consultas conceptuales: texto `0.35`, semántica `0.65`;
 - el máximo de contexto será limitado y cada fragmento llevará su fuente.
+
+Implementacion inicial:
+
+- `hybrid_search_ai_document_sections` aplica RLS, filtro de fuente, texto completo y similitud vectorial;
+- el ranking usa Reciprocal Rank Fusion con `rrf_k = 60`;
+- `inferHybridMode` ajusta pesos: balanceado, texto primero o semantica primero.
 
 ## Generación de embeddings
 
@@ -181,6 +200,13 @@ Antes de mostrarlo se valida:
 8. confianza y cobertura de fuentes;
 9. confirmación obligatoria para escrituras.
 
+Implementacion inicial:
+
+- `output-guard` valida fuentes, `data_version`, moneda, confianza y confirmaciones;
+- `redactSensitiveText` oculta emails, claves y numeros compatibles con tarjetas;
+- la API devuelve `output.status`: `approved`, `needs_review` o `blocked`;
+- respuestas con verificacion SQL pendiente no pueden salir con confianza alta.
+
 Confianza inicial:
 
 - `>= 0.90`: mostrar con fuentes;
@@ -205,6 +231,13 @@ Registrar sin datos sensibles:
 - coste estimado y valoración del usuario.
 
 El conjunto de evaluación incluirá cálculos, ambigüedades, consultas semánticas, intentos de acceso cruzado, prompt injection y acciones sin confirmación.
+
+Implementacion inicial:
+
+- `tests/ai-evals/cases.mjs` define casos esperados declarativos;
+- `tests/ai-evals/assistant-evals.test.mjs` ejecuta el pipeline local sin llamar modelos externos;
+- `npm run test:ai` valida intencion, filtros, ruta RAG, redacciones y estado de salida;
+- `npm test` ejecuta unitarias y evaluaciones de IA juntas.
 
 ## Referencias técnicas
 

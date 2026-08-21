@@ -25,3 +25,24 @@ export function calculatePending(amounts: number[]) {
 export function calculateProjected(available: number, pending: number) {
   return available-pending;
 }
+
+export type BudgetLine = {
+  categoryId: string;
+  plannedAmount: number;
+  actualAmount: number;
+};
+
+export function calculateBudgetTotals(lines: BudgetLine[]) {
+  const planned = lines.reduce((total,line)=>total+line.plannedAmount,0);
+  const actual = lines.reduce((total,line)=>total+line.actualAmount,0);
+  return {
+    planned,
+    actual,
+    remaining: planned-actual,
+    usedPercent: planned === 0 ? 0 : Math.round((actual/planned)*100),
+  };
+}
+
+export function calculateBudgetRemaining(line: Pick<BudgetLine,"plannedAmount"|"actualAmount">) {
+  return line.plannedAmount-line.actualAmount;
+}

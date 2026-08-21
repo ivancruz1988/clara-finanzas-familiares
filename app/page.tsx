@@ -6,6 +6,10 @@ import { accounts, budgets, payments as initialPayments, transactions as initial
 import type { Payment, Transaction } from "@/lib/types";
 import { AuthGate } from "@/app/auth-gate";
 import { AccountsView } from "@/components/accounts/accounts-view";
+import { AssistantWidget } from "@/components/assistant/assistant-widget";
+import { BudgetView } from "@/components/budgets/budget-view";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { PaymentsView } from "@/components/payments/payments-view";
 import { EntryModal } from "@/components/transactions/entry-modal";
 import { TransactionsView } from "@/components/transactions/transactions-view";
 
@@ -16,8 +20,8 @@ type View = "Resumen" | "Movimientos" | "Presupuesto" | "Cuentas" | "Pagos";
 export default function Home() {
   const [view,setView]=useState<View>("Resumen");const [transactions,setTransactions]=useState(initialTransactions);const [payments,setPayments]=useState(initialPayments);const [modal,setModal]=useState<"transaction"|"payment"|null>(null);
   const available=accounts.reduce((sum,a)=>sum+a.balance,0);const pending=payments.filter(p=>p.status==="pending").reduce((sum,p)=>sum+p.amount,0);const projected=available-pending;
-  const page=view==="Resumen"?<Dashboard available={available} pending={pending} projected={projected} transactions={transactions} payments={payments} setView={setView}/>:view==="Movimientos"?<TransactionsView refreshKey={transactions.length}/>:view==="Presupuesto"?<Budget/>:view==="Cuentas"?<AccountsView pending={payments}/>:<Payments items={payments} onToggle={id=>setPayments(items=>items.map(item=>item.id===id?{...item,status:item.status==="paid"?"pending":"paid"}:item))}/>;
-  return <AuthGate><div className="shell"><Sidebar view={view} setView={setView}/><main className="main"><header className="topbar"><div><p className="eyebrow">FINANZAS FAMILIARES</p><h1>{view}</h1></div><div className="top-actions"><button className="period"><CalendarDays size={17}/> Julio 2026 <ChevronDown size={16}/></button><button className="primary" onClick={()=>setModal("transaction")}><Plus size={18}/> Nuevo movimiento</button></div></header>{page}</main>{modal&&<EntryModal type={modal} onClose={()=>setModal(null)} onTransaction={item=>setTransactions(x=>[item,...x])} onPayment={item=>setPayments(x=>[item,...x])}/>}</div></AuthGate>;
+  const page=view==="Resumen"?<DashboardView refreshKey={transactions.length+payments.length} setView={setView}/>:view==="Movimientos"?<TransactionsView refreshKey={transactions.length}/>:view==="Presupuesto"?<BudgetView/>:view==="Cuentas"?<AccountsView pending={payments}/>:<PaymentsView refreshKey={payments.length}/>;
+  return <AuthGate><div className="shell"><Sidebar view={view} setView={setView}/><main className="main"><header className="topbar"><div><p className="eyebrow">FINANZAS FAMILIARES</p><h1>{view}</h1></div><div className="top-actions"><button className="period"><CalendarDays size={17}/> Julio 2026 <ChevronDown size={16}/></button><button className="primary" onClick={()=>setModal("transaction")}><Plus size={18}/> Nuevo movimiento</button></div></header>{page}</main>{modal&&<EntryModal type={modal} onClose={()=>setModal(null)} onTransaction={item=>setTransactions(x=>[item,...x])} onPayment={item=>setPayments(x=>[item,...x])}/>}<AssistantWidget/></div></AuthGate>;
 }
 
 function Sidebar({view,setView}:{view:View;setView:(v:View)=>void}){const links:[View,React.ReactNode][]=[["Resumen",<LayoutDashboard key="1"/>],["Movimientos",<ReceiptText key="2"/>],["Presupuesto",<Target key="3"/>],["Cuentas",<WalletCards key="4"/>],["Pagos",<CircleDollarSign key="5"/>]];return <aside className="sidebar"><div className="brand"><span>c</span><strong>clara</strong></div><nav>{links.map(([label,icon])=><button className={view===label?"active":""} onClick={()=>setView(label)} key={label}>{icon}{label}</button>)}</nav><div className="side-bottom"><div className="demo"><span>Supabase activo</span><small>Los datos se guardan de forma segura en la nube.</small></div><button><Settings/>Configuración</button><div className="profile"><span>GC</span><div><strong>Guada Cruz</strong><small>Cuenta familiar</small></div></div></div></aside>}

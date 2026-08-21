@@ -37,7 +37,7 @@ La IA puede proponer, pero requieren confirmación explícita:
 - marcar pagos;
 - modificar saldos o presupuestos;
 - invitar miembros;
-- importaciones masivas.
+- cargas masivas.
 
 La confirmación incluye entidad, importe, moneda, fecha y efecto esperado. Las operaciones usan idempotencia y generan auditoría.
 
@@ -73,3 +73,4 @@ Si faltan fuentes, hay baja confianza, versiones antiguas o discrepancias numér
 6. Una respuesta vencida no se reutiliza.
 7. Una acción sin confirmación no se ejecuta.
 8. Los logs no contienen secretos ni datos completos.
+
