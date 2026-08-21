@@ -8,5 +8,8 @@ node_modules
 outputs/
 Presupuesto_Familiar_Cruz_2026_original.xlsx
 tmp/
-.claude/
+.claude/*
+!.claude/mcp-servers/
+!.claude/MCP_SETUP.md
+.claude/settings.local.json
 
