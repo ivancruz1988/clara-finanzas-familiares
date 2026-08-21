@@ -1,6 +1,6 @@
 # Clara — Finanzas familiares
 
-Aplicación web inspirada en la planilla `Presupuesto_Familiar_Cruz_2026`. Reúne presupuesto mensual, movimientos en efectivo y bancos, órdenes de pago, saldos y disponible proyectado.
+Aplicación web para organizar finanzas familiares. Reúne presupuesto mensual, movimientos en efectivo y bancos, órdenes de pago, saldos y disponible proyectado.
 
 ## Documentación
 
@@ -8,6 +8,12 @@ Aplicación web inspirada en la planilla `Presupuesto_Familiar_Cruz_2026`. Reún
 - [Plan diario](docs/ROADMAP.md)
 - [Estado actual](docs/STATUS.md)
 - [Estructura y convenciones](docs/PROJECT_STRUCTURE.md)
+- [Sistema visual](docs/VISUAL_SYSTEM.md)
+- [Acceso familiar](docs/AUTHENTICATION.md)
+- [Diagramas del proyecto](docs/DIAGRAMAS.md) ([PDF para imprimir](output/pdf/diagramas-proyecto-clara.pdf))
+- [Arquitectura de IA y RAG](docs/AI_RAG_ARCHITECTURE.md)
+- [Diccionario de datos](docs/DATA_DICTIONARY.md)
+- [Seguridad y privacidad](docs/SECURITY.md)
 - [Guía de contribución](CONTRIBUTING.md)
 
 ## Desarrollo local
@@ -39,4 +45,5 @@ Subir este repositorio a GitHub, importarlo en Vercel y agregar las variables `N
 - Diseño responsive para celular y escritorio.
 - Esquema PostgreSQL multiusuario con RLS para Supabase.
 
-La interfaz actual usa datos demo; el esquema y cliente Supabase están listos para conectar la capa de persistencia y autenticación.
+La app funciona en modo demo si Supabase no está configurado, y usa persistencia real cuando se cargan las variables de entorno.
+

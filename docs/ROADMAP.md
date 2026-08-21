@@ -1,36 +1,76 @@
-# Plan diario de implementación
+# Plan diario de implementacion
 
-Inicio propuesto: **lunes 3 de agosto de 2026**. Cada jornada tiene un resultado verificable y puede cerrarse con un commit o pull request.
+Este plan refleja el avance real al 10 de agosto de 2026. Las etapas 1 a 10 ya quedaron abordadas antes de las fechas originales, por lo que el resto del calendario se reagenda desde el 11 de agosto.
 
-| Día | Fecha | Etapa | Entregable |
+## Etapas completadas
+
+| Dia | Fecha | Etapa | Resultado |
 |---|---|---|---|
-| 1 | Lun 03/08 | Base del proyecto | Repositorio, documentación, ramas y tablero de trabajo |
-| 2 | Mar 04/08 | Supabase | Proyecto, esquema SQL, RLS y variables de entorno |
-| 3 | Mié 05/08 | Acceso familiar | Login, sesión, creación de hogar y miembros |
-| 4 | Jue 06/08 | Cuentas y categorías | CRUD de efectivo, bancos, billeteras y categorías |
-| 5 | Vie 07/08 | Movimientos | Alta, edición, eliminación, filtros y saldos automáticos |
-| 6 | Lun 10/08 | Presupuesto | Presupuesto mensual, inflación y copia al mes siguiente |
-| 7 | Mar 11/08 | Pagos programados | Órdenes de pago, vencimientos, estados y cuenta de origen |
-| 8 | Mié 12/08 | Tablero | Indicadores, comparaciones y disponible proyectado |
-| 9 | Jue 13/08 | Calidad | Pruebas, responsive, accesibilidad y revisión de seguridad |
-| 10 | Vie 14/08 | Publicación | GitHub definitivo, Vercel, dominio, respaldo y manual de uso |
+| 1 | 03/08/2026 | Base del proyecto | Repositorio, documentacion y aplicacion Next.js |
+| 2 | 04/08/2026 | Supabase | Esquema PostgreSQL, RLS y entorno local |
+| 3 | 05/08/2026 | Acceso familiar | Registro, login, sesion y creacion de hogar |
+| 4 | 09/08/2026 | Cuentas y categorias | CRUD persistente por hogar |
+| 5 | 09/08/2026 | Refactorizacion modular | UI, servicios, tipos y modulos financieros separados |
+| 6 | 09/08/2026 | Motor financiero | Saldos, pendientes y proyeccion con pruebas unitarias |
+| 7 | 09/08/2026 | Movimientos | CRUD, busqueda y filtro por tipo con datos reales |
+| 8 | 09/08/2026 | Transferencias | Operacion atomica entre cuentas con doble movimiento |
+| 9 | 10/08/2026 | Presupuesto | Plan mensual persistido y comparacion contra gastos reales |
+| 10 | 10/08/2026 | Pagos programados | Vencimientos persistidos, confirmacion y movimiento real asociado |
+| 11 | 11/08/2026 | Tablero real | Indicadores obtenidos desde SQL y datos persistidos |
+| 12 | 11/08/2026 | Auditoria y versionado | `audit_events`, `data_version` e idempotencia |
+| 13 | 11/08/2026 | API del asistente | Endpoint servidor, autenticacion, rate limit y contratos JSON |
+| 14 | 11/08/2026 | Intenciones y filtros | Clasificador, periodos, cuentas, categorias, moneda, estado y montos |
+| 15 | 11/08/2026 | Cache exacta | Clave normalizada, TTL, metricas e invalidacion por `data_version` |
+| 16 | 11/08/2026 | Base vectorial | `pgvector`, documentos, secciones, embeddings, FTS y RLS |
+| 17 | 11/08/2026 | Cache semantica | Similitud, umbrales, aislamiento por hogar y reutilizacion segura |
+| 18 | 12/08/2026 | Busqueda hibrida | Full-text + vectores + filtros estructurados + ranking RRF |
+| 19 | 12/08/2026 | RAG financiero | Enrutador SQL/vector/hibrido y construccion de contexto |
+| 20 | 12/08/2026 | Filtros de salida | Validacion de fuentes, cifras, vigencia, privacidad y confianza |
+| 21 | 12/08/2026 | Evaluaciones de IA | Casos esperados, seguridad, precision, latencia y coste |
 
-## Definición de terminado
+## Agenda de publicación
 
-Una etapa diaria queda terminada cuando:
+| Dia | Fecha | Etapa | Entregable verificable |
+|---|---|---|---|
+| 22 | 20/08/2026 | Calidad integral | Pruebas, responsive, accesibilidad, rendimiento y seguridad |
+| 23 | 20/08/2026 | Publicacion | Vercel, variables, migraciones, respaldo y manual de uso |
 
-- el código compila;
-- la funcionalidad fue probada;
-- no se guardaron secretos en Git;
-- se actualizó la documentación relacionada;
+## Orden de dependencias
+
+```mermaid
+flowchart LR
+    A["Modulos financieros"] --> B["Motor financiero"]
+    B --> C["Auditoria y data_version"]
+    C --> D["API del asistente"]
+    D --> E["Cache exacta"]
+    E --> F["pgvector"]
+    F --> G["Cache semantica"]
+    G --> H["Busqueda hibrida"]
+    H --> I["RAG"]
+    I --> J["Filtros de salida"]
+    J --> K["Evaluaciones"]
+```
+
+## Definicion de terminado
+
+Una etapa queda terminada cuando:
+
+- el codigo compila y las migraciones son reproducibles;
+- existen pruebas proporcionales al riesgo;
+- RLS impide acceso entre hogares;
+- los calculos financieros se validan contra SQL;
+- no se guardan secretos ni datos financieros reales en Git;
+- se actualiza la documentacion relacionada;
 - existe un commit descriptivo;
 - el resultado puede demostrarse.
 
-## Después del lanzamiento
+## Criterios especiales para IA
 
-- Importación completa desde Excel.
-- Gastos recurrentes y recordatorios.
-- Exportación a Excel/PDF.
-- Gráficos históricos y metas de ahorro.
-- Conversión entre monedas.
-- Aplicación instalable (PWA).
+- ninguna cifra se acepta sin recalcularla en PostgreSQL;
+- ninguna respuesta cruza limites de hogar;
+- toda respuesta indica periodo, moneda y fuentes;
+- las acciones de escritura requieren confirmacion;
+- un cambio financiero invalida la cache anterior;
+- los cambios de modelo o prompt deben superar las evaluaciones.
+
+

@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:finance": "node --test tests/unit/finance.test.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:ai": "node --test tests/ai-evals/*.test.mjs",
+    "test": "npm run test:unit && npm run test:ai"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0",
