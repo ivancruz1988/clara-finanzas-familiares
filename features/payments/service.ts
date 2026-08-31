@@ -63,6 +63,14 @@ export async function deletePaymentOrder(paymentId: string) {
   if (error) throw error;
 }
 
+export async function updatePaymentOrderDate(paymentId: string, dueDate: string) {
+  const { error } = await client()
+    .from("payment_orders")
+    .update({ due_date: dueDate })
+    .eq("id", paymentId)
+    .eq("status", "pending");
+  if (error) throw error;
+}
 export async function createPayment(input: { householdId:string; accountId:string; categoryId:string; date:string; description:string; amount:number }) {
   const { data, error } = await client().from("payment_orders").insert({
     household_id:input.householdId,
@@ -77,3 +85,4 @@ export async function createPayment(input: { householdId:string; accountId:strin
   if (error) throw error;
   return data.id as string;
 }
+

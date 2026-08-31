@@ -339,3 +339,8 @@ body {
 .month-filter{position:relative;min-width:140px;justify-content:center}
 .month-filter input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
 
+.payment-date{position:relative;width:74px;height:34px;border:1px solid #2c4a3d;border-radius:8px;background:#102219;color:#cfe2d9;display:grid;place-items:center;font-size:12px;font-weight:700;cursor:pointer;overflow:hidden}
+.payment-date span{pointer-events:none}
+.payment-date input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;color-scheme:dark}
+.payment-date input:disabled{cursor:not-allowed}
+.payment-date:focus-within{border-color:var(--green);box-shadow:0 0 0 2px #21e49b22}

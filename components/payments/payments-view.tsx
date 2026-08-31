@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, CircleDollarSign, LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { useHousehold } from "@/app/family-context";
 import { EntryModal } from "@/components/transactions/entry-modal";
-import { confirmPaymentOrder, deletePaymentOrder, listPaymentOrders, type DbPaymentOrder } from "@/features/payments/service";
+import { confirmPaymentOrder, deletePaymentOrder, listPaymentOrders, updatePaymentOrderDate, type DbPaymentOrder } from "@/features/payments/service";
 import type { Payment, Transaction } from "@/lib/types";
 
 const money = new Intl.NumberFormat("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0});
@@ -70,6 +70,25 @@ export function PaymentsView({month,refreshKey=0}:{month:string;refreshKey?:numb
     }
   }
 
+
+  async function changeDueDate(item: DbPaymentOrder, dueDate: string) {
+    if (!dueDate || dueDate === item.due_date) return;
+    setBusy(item.id);
+    setError("");
+    setMessage("");
+    try {
+      await updatePaymentOrderDate(item.id, dueDate);
+      setItems(current=>current.map(payment=>payment.id===item.id ? {...payment,due_date:dueDate} : payment).sort((a,b)=>{
+        if (a.status !== b.status) return a.status === "pending" ? -1 : 1;
+        return a.due_date.localeCompare(b.due_date);
+      }));
+      setMessage("Fecha de pago actualizada.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo cambiar la fecha del pago.");
+    } finally {
+      setBusy(null);
+    }
+  }
   function onPayment(payment: Payment) {
     setItems(current=>[{
       id: payment.id,
@@ -106,7 +125,7 @@ export function PaymentsView({month,refreshKey=0}:{month:string;refreshKey?:numb
         <div className="payment-table payment-real">
           {visibleItems.map(item=><div key={item.id}>
             <button onClick={()=>item.status==="pending" ? confirmPayment(item) : undefined} disabled={item.status==="paid" || busy===item.id} className={item.status==="paid"?"check checked":"check"} aria-label={`Confirmar ${item.description}`}>{busy===item.id?<LoaderCircle className="spin"/>:item.status==="paid"?"✓":""}</button>
-            <time>{shortDate(item.due_date)}</time>
+            {item.status==="pending" ? <label className="payment-date"><span>{shortDate(item.due_date)}</span><input aria-label={`Cambiar fecha de ${item.description}`} type="date" value={item.due_date} disabled={busy===item.id} onChange={event=>changeDueDate(item,event.target.value)}/></label> : <time>{shortDate(item.due_date)}</time>}
             <p>{item.description}<small>{item.category_name} · {item.account_name}</small></p>
             <strong>{money.format(item.amount)}</strong>
             <span className={`pill ${item.status}`}>{item.status==="paid"?"Pagado":"Pendiente"}</span>
@@ -121,5 +140,6 @@ export function PaymentsView({month,refreshKey=0}:{month:string;refreshKey?:numb
 function Stat({label,value,text,note,icon,featured}:{label:string;value?:number;text?:string;note:string;icon:React.ReactNode;featured?:boolean}) {
   return <div className={`stat ${featured?"featured":""}`}><div className="stat-icon">{icon}</div><p>{label}</p><strong>{text || money.format(value || 0)}</strong><small>{note}</small></div>;
 }
+
 
 
