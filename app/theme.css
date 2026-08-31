@@ -336,11 +336,14 @@ body {
 .ai-fab{position:fixed;right:24px;bottom:86px;z-index:24;height:52px;border:1px solid var(--green);border-radius:999px;background:var(--green);color:#03130c;display:flex;align-items:center;gap:8px;padding:0 18px;font:800 13px Inter,"Segoe UI",Arial,sans-serif;box-shadow:0 18px 45px #00000055;cursor:pointer}.ai-panel{position:fixed;right:24px;bottom:150px;z-index:23;width:min(420px,calc(100vw - 32px));max-height:min(620px,calc(100vh - 175px));display:flex;flex-direction:column;background:#102219;border:1px solid #2e4d40;border-radius:16px;box-shadow:0 35px 90px #000000a3;overflow:hidden}.ai-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 18px 12px;border-bottom:1px solid #263b33}.ai-head h2{margin:0;font:800 20px Inter,"Segoe UI",Arial,sans-serif}.ai-head button{width:32px;height:32px;border:0;border-radius:8px;background:#1b352a;color:#dcece4;display:grid;place-items:center;cursor:pointer}.ai-head svg{width:16px}.ai-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px}.ai-tabs button{height:36px;border:1px solid #304a40;border-radius:9px;background:#0a1812;color:#a9bcb3;display:flex;align-items:center;justify-content:center;gap:7px;font:700 12px Inter,"Segoe UI",Arial,sans-serif;cursor:pointer}.ai-tabs button.active{border-color:var(--green);color:var(--green);background:#17392c}.ai-thread{flex:1;overflow:auto;padding:8px 14px 14px;display:flex;flex-direction:column;gap:10px}.ai-message{max-width:88%;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.4;white-space:pre-wrap}.ai-message.assistant{align-self:flex-start;background:#173329;color:#dcece4}.ai-message.user{align-self:flex-end;background:#1d6a4d;color:white}.ai-compose{display:grid;grid-template-columns:1fr 46px;gap:10px;padding:14px;border-top:1px solid #263b33}.ai-compose textarea{resize:none;border:1px solid #345044;border-radius:10px;background:#0a1812;color:var(--ink);padding:10px;font:13px Inter,"Segoe UI",Arial,sans-serif;outline:0}.ai-compose .primary{width:46px;height:auto;justify-content:center;padding:0}
 @media(max-width:700px){.ai-fab{right:16px;bottom:136px}.ai-panel{right:12px;left:12px;bottom:200px;width:auto;max-height:calc(100vh - 225px)}}
 
-.month-filter{position:relative;min-width:140px;justify-content:center}
-.month-filter input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.month-filter{position:relative;min-width:190px;padding-right:12px}
+.month-filter select{appearance:none;border:0;outline:0;background:transparent;color:inherit;font:800 13px Inter,"Segoe UI",Arial,sans-serif;cursor:pointer;flex:1;min-width:0;color-scheme:dark}
+.month-filter select option{background:#102219;color:#d9e7df}
 
 .payment-date{position:relative;width:74px;height:34px;border:1px solid #2c4a3d;border-radius:8px;background:#102219;color:#cfe2d9;display:grid;place-items:center;font-size:12px;font-weight:700;cursor:pointer;overflow:hidden}
 .payment-date span{pointer-events:none}
 .payment-date input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;color-scheme:dark}
 .payment-date input:disabled{cursor:not-allowed}
 .payment-date:focus-within{border-color:var(--green);box-shadow:0 0 0 2px #21e49b22}
+
+
