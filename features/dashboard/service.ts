@@ -58,7 +58,7 @@ export async function loadDashboard(householdId: string, month: string): Promise
   const [accounts,movements,payments,categories,budgets,monthExpenses,recentTransactions] = await Promise.all([
     api.from("accounts").select("id,opening_balance").eq("household_id",householdId),
     api.from("transactions").select("account_id,amount,kind").eq("household_id",householdId),
-    api.from("payment_orders").select("id,due_date,description,amount,accounts(name)").eq("household_id",householdId).eq("status","pending").order("due_date",{ascending:true}).limit(6),
+    api.from("payment_orders").select("id,due_date,description,amount,accounts(name)").eq("household_id",householdId).eq("status","pending").gte("due_date",month).lt("due_date",nextMonth(month)).order("due_date",{ascending:true}),
     api.from("categories").select("id,name").eq("household_id",householdId).eq("kind","expense").order("name"),
     api.from("monthly_budgets").select("category_id,planned_amount").eq("household_id",householdId).eq("month",month),
     api.from("transactions").select("category_id,amount").eq("household_id",householdId).eq("kind","expense").gte("transaction_date",month).lt("transaction_date",nextMonth(month)),
@@ -130,7 +130,8 @@ export async function loadDashboard(householdId: string, month: string): Promise
     projected: calculateProjected(available,pending),
     pendingCount: paymentRows.length,
     budget: {...budgetTotals,lines: budgetLines},
-    payments: paymentRows,
+    payments: paymentRows.slice(0,6),
     transactions,
   };
 }
+
