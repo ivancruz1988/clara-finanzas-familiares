@@ -8,6 +8,12 @@ create table public.households (
   created_at timestamptz not null default now()
 );
 
+create table public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 create table public.household_members (
   household_id uuid references public.households(id) on delete cascade,
   user_id uuid references auth.users(id) on delete cascade,
@@ -64,6 +70,15 @@ create table public.payment_orders (
   created_at timestamptz not null default now()
 );
 
+create table public.payment_reminders (
+  id uuid primary key default gen_random_uuid(),
+  household_id uuid not null references public.households(id) on delete cascade,
+  payment_order_id uuid not null references public.payment_orders(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  reminder_date date not null,
+  sent_at timestamptz not null default now(),
+  unique(payment_order_id, user_id, reminder_date)
+);
 create table public.monthly_budgets (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
@@ -246,11 +261,30 @@ begin
 end;
 $$;
 
+
+create or replace function public.handle_new_user_profile()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id, email)
+  values (new.id, coalesce(new.email, ''))
+  on conflict (id) do update set email = excluded.email, updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_profile on auth.users;
+create trigger on_auth_user_created_profile
+  after insert or update of email on auth.users
+  for each row execute function public.handle_new_user_profile();
 revoke all on function public.current_household() from public;
 revoke all on function public.create_household(text) from public;
 grant execute on function public.current_household() to authenticated;
 grant execute on function public.create_household(text) to authenticated;
 
+create policy "users read own profile" on public.profiles
+  for select using (id = auth.uid());
+create policy "members read payment reminders" on public.payment_reminders
+  for select using (public.is_household_member(household_id));
 create policy "members read households" on public.households for select using (public.is_household_member(id));
 create policy "users create households" on public.households for insert with check (created_by = auth.uid());
 create policy "members read memberships" on public.household_members for select using (public.is_household_member(household_id));
@@ -290,6 +324,8 @@ end $$;
 create index transactions_household_date_idx on public.transactions(household_id, transaction_date desc);
 create index transactions_transfer_group_idx on public.transactions(transfer_group_id) where transfer_group_id is not null;
 create unique index transactions_household_idempotency_idx on public.transactions(household_id,idempotency_key);
+create index payment_reminders_household_date_idx on public.payment_reminders(household_id, reminder_date desc);
+create index payment_reminders_user_date_idx on public.payment_reminders(user_id, reminder_date desc);
 create index payments_household_due_idx on public.payment_orders(household_id, due_date, status);
 create unique index payment_orders_household_idempotency_idx on public.payment_orders(household_id,idempotency_key);
 create index audit_events_household_version_idx on public.audit_events(household_id,data_version desc);
@@ -601,3 +637,5 @@ $$;
 
 revoke all on function public.confirm_payment_order(uuid,date) from public;
 grant execute on function public.confirm_payment_order(uuid,date) to authenticated;
+
+

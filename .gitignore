@@ -11,3 +11,4 @@ tmp/
 .claude/
 clara-finanzas-familiares/
 
+tsconfig.tsbuildinfo
