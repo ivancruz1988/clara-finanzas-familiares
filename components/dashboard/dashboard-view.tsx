@@ -8,11 +8,7 @@ import { loadDashboard, type DashboardData, type DashboardTransaction } from "@/
 const money = new Intl.NumberFormat("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0});
 const shortDate = (value: string) => new Intl.DateTimeFormat("es-AR",{day:"2-digit",month:"short"}).format(new Date(`${value}T12:00:00`));
 
-function currentMonthStart() {
-  return `${new Date().toISOString().slice(0,7)}-01`;
-}
-
-export function DashboardView({setView,refreshKey=0}:{setView:(view:"Movimientos"|"Presupuesto"|"Pagos")=>void;refreshKey?:number}) {
+export function DashboardView({setView,month,refreshKey=0}:{setView:(view:"Movimientos"|"Presupuesto"|"Pagos")=>void;month:string;refreshKey?:number}) {
   const household = useHousehold();
   const [data,setData] = useState<DashboardData | null>(null);
   const [loading,setLoading] = useState(true);
@@ -22,11 +18,11 @@ export function DashboardView({setView,refreshKey=0}:{setView:(view:"Movimientos
     if (!household) return;
     setLoading(true);
     setError("");
-    loadDashboard(household.id,currentMonthStart())
+    loadDashboard(household.id,month)
       .then(setData)
       .catch(err=>setError(err instanceof Error ? err.message : "No se pudo cargar el tablero."))
       .finally(()=>setLoading(false));
-  },[household,refreshKey]);
+  },[household,month,refreshKey]);
 
   if (loading) return <div className="content empty-state"><LoaderCircle className="spin"/><p>Cargando tablero...</p></div>;
   if (error) return <div className="content"><p className="form-message error">{error}</p></div>;
@@ -82,3 +78,4 @@ function CardTitle({title,action,onClick}:{title:string;action:string;onClick:()
 function TransactionTable({items}:{items:DashboardTransaction[]}) {
   return <div className="table"><div className="tr head"><span>FECHA</span><span>DETALLE</span><span>CATEGORIA</span><span>CUENTA</span><span>IMPORTE</span></div>{items.map(item=><div className="tr" key={item.id}><span>{shortDate(item.transaction_date)}</span><strong>{item.description}</strong><span><i className="mini-dot"/>{item.category_name}</span><span>{item.account_name}</span><strong className={item.kind==="expense"?"negative":"positive"}>{item.kind==="expense"?"- ":"+ "}{money.format(item.amount)}</strong></div>)}</div>;
 }
+

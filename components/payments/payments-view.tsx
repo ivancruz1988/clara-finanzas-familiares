@@ -10,7 +10,7 @@ import type { Payment, Transaction } from "@/lib/types";
 const money = new Intl.NumberFormat("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0});
 const shortDate = (value: string) => new Intl.DateTimeFormat("es-AR",{day:"2-digit",month:"short"}).format(new Date(`${value}T12:00:00`));
 
-export function PaymentsView({refreshKey=0}:{refreshKey?:number}) {
+export function PaymentsView({month,refreshKey=0}:{month:string;refreshKey?:number}) {
   const household = useHousehold();
   const [items,setItems] = useState<DbPaymentOrder[]>([]);
   const [loading,setLoading] = useState(true);
@@ -34,8 +34,10 @@ export function PaymentsView({refreshKey=0}:{refreshKey?:number}) {
 
   useEffect(()=>{reload()},[household,refreshKey]);
 
-  const pending = useMemo(()=>items.filter(item=>item.status==="pending"),[items]);
-  const paid = useMemo(()=>items.filter(item=>item.status==="paid"),[items]);
+  const selectedMonth = month.slice(0,7);
+  const visibleItems = useMemo(()=>items.filter(item=>item.due_date.startsWith(selectedMonth)),[items,selectedMonth]);
+  const pending = useMemo(()=>visibleItems.filter(item=>item.status==="pending"),[visibleItems]);
+  const paid = useMemo(()=>visibleItems.filter(item=>item.status==="paid"),[visibleItems]);
   const pendingTotal = pending.reduce((total,item)=>total+item.amount,0);
 
   async function confirmPayment(item: DbPaymentOrder) {
@@ -98,11 +100,11 @@ export function PaymentsView({refreshKey=0}:{refreshKey?:number}) {
       <Stat label="Confirmados" value={paid.reduce((total,item)=>total+item.amount,0)} note={`${paid.length} pagos`} icon={<Check/>}/>
       <Stat label="Proximo vencimiento" text={pending[0] ? shortDate(pending[0].due_date) : "-"} note={pending[0]?.description || "Sin pagos pendientes"} featured icon={<CircleDollarSign/>}/>
     </section>
-    {items.length === 0 ? <div className="card empty-state"><CircleDollarSign/><h3>No hay pagos programados</h3><p>Agrega vencimientos para proyectar compromisos y confirmarlos al pagar.</p></div> :
+    {visibleItems.length === 0 ? <div className="card empty-state"><CircleDollarSign/><h3>No hay pagos programados</h3><p>Agrega vencimientos para proyectar compromisos y confirmarlos al pagar.</p></div> :
       <section className="card">
         <div className="card-title"><h3>Ordenes de pago</h3><span>{pending.length} pendientes</span></div>
         <div className="payment-table payment-real">
-          {items.map(item=><div key={item.id}>
+          {visibleItems.map(item=><div key={item.id}>
             <button onClick={()=>item.status==="pending" ? confirmPayment(item) : undefined} disabled={item.status==="paid" || busy===item.id} className={item.status==="paid"?"check checked":"check"} aria-label={`Confirmar ${item.description}`}>{busy===item.id?<LoaderCircle className="spin"/>:item.status==="paid"?"✓":""}</button>
             <time>{shortDate(item.due_date)}</time>
             <p>{item.description}<small>{item.category_name} · {item.account_name}</small></p>
@@ -119,3 +121,5 @@ export function PaymentsView({refreshKey=0}:{refreshKey?:number}) {
 function Stat({label,value,text,note,icon,featured}:{label:string;value?:number;text?:string;note:string;icon:React.ReactNode;featured?:boolean}) {
   return <div className={`stat ${featured?"featured":""}`}><div className="stat-icon">{icon}</div><p>{label}</p><strong>{text || money.format(value || 0)}</strong><small>{note}</small></div>;
 }
+
+

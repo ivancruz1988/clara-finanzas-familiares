@@ -17,14 +17,8 @@ function previousMonth(value: string) {
   date.setMonth(date.getMonth()-1);
   return date.toISOString().slice(0,7);
 }
-
-function currentMonth() {
-  return new Date().toISOString().slice(0,7);
-}
-
-export function BudgetView() {
+export function BudgetView({month,onMonthChange}:{month:string;onMonthChange:(month:string)=>void}) {
   const household = useHousehold();
-  const [month,setMonth] = useState(currentMonth());
   const [rows,setRows] = useState<BudgetRow[]>([]);
   const [loading,setLoading] = useState(true);
   const [saving,setSaving] = useState<string | null>(null);
@@ -93,7 +87,7 @@ export function BudgetView() {
     <div className="section-heading">
       <div><h2>Presupuesto mensual</h2><p>Plan por categoria y comparacion contra gastos reales.</p></div>
       <div className="heading-actions">
-        <input className="month-picker" type="month" value={month} onChange={event=>setMonth(event.target.value)} />
+        <input className="month-picker" type="month" value={month} onChange={event=>onMonthChange(event.target.value)} />
         <button className="soft compact" onClick={copyPrevious} disabled={copying}><Copy size={17}/> Copiar mes anterior</button>
       </div>
     </div>
@@ -128,3 +122,5 @@ export function BudgetView() {
 function Stat({label,value,note,icon,featured}:{label:string;value:number;note:string;icon:React.ReactNode;featured?:boolean}) {
   return <div className={`stat ${featured?"featured":""}`}><div className="stat-icon">{icon}</div><p>{label}</p><strong>{money.format(value)}</strong><small>{note}</small></div>;
 }
+
+
